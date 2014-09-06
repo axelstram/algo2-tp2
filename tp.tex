@@ -1,0 +1,1713 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[paper=a4paper, hmargin=1.5cm, bottom=1.5cm, top=3.5cm]{geometry}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{xspace}
+\usepackage{xargs}
+\usepackage{ifthen}
+\usepackage{aed2-tad,aed2-symb,aed2-itef,caratula}
+\usepackage{algpseudocode}  %QUE CARAJOS ES ESTO?
+
+
+\newcommand{\moduloNombre}[1]{\textbf{#1}}
+
+\let\NombreFuncion=\textsc
+\let\TipoVariable=\texttt
+\let\ModificadorArgumento=\textbf
+\newcommand{\res}{$res$\xspace}
+\newcommand{\tab}{\hspace*{7mm}}
+
+\newcommandx{\TipoFuncion}[3]{%
+  \NombreFuncion{#1}(#2) \ifx#3\empty\else $\to$ \res\,: \TipoVariable{#3}\fi% nombreFuncion(parametros) -> res:(Tipo)
+}
+\newcommand{\In}[2]{\ModificadorArgumento{in} \ensuremath{#1}\,: \TipoVariable{#2}\xspace}
+\newcommand{\Out}[2]{\ModificadorArgumento{out} \ensuremath{#1}\,: \TipoVariable{#2}\xspace}
+\newcommand{\Inout}[2]{\ModificadorArgumento{in/out} \ensuremath{#1}\,: \TipoVariable{#2}\xspace}
+\newcommand{\Aplicar}[2]{\NombreFuncion{#1}(#2)}
+
+\newlength{\IntFuncionLengthA}
+\newlength{\IntFuncionLengthB}
+\newlength{\IntFuncionLengthC}
+%InterfazFuncion(nombre, argumentos, valor retorno, precondicion, postcondicion, complejidad, descripcion, aliasing)
+\newcommandx{\InterfazFuncion}[9][4=true,6,7,8,9]{%
+  \hangindent=\parindent
+  \TipoFuncion{#1}{#2}{#3}\\%
+  \textbf{Pre} $\equiv$ \{#4\}\\%
+  \textbf{Post} $\equiv$ \{#5\}%
+  \ifx#6\empty\else\\\textbf{Complejidad:} #6\fi%
+  \ifx#7\empty\else\\\textbf{Descripcion:} #7\fi%
+  \ifx#8\empty\else\\\textbf{Aliasing:} #8\fi%
+  \ifx#9\empty\else\\\textbf{Requiere:} #9\fi%
+}
+
+\newenvironment{Interfaz}{%
+  \parskip=2ex%
+  \noindent\textbf{\Large Interfaz}%
+  \par%
+}{}
+
+\newenvironment{Representacion}{%
+  \vspace*{2ex}%
+  \noindent\textbf{\Large Representacion}%
+  \vspace*{2ex}%
+}{}
+
+\newenvironment{Algoritmos}{%
+  \vspace*{2ex}%
+  \noindent\textbf{\Large Algoritmos}%
+  \vspace*{2ex}%
+}{}
+
+\newenvironment{Servicios Usados}{%
+  \vspace*{2ex}%
+  \noindent\textbf{\Large Servicios Usados}%
+  \vspace*{2ex}%
+}{}
+
+\newcommand{\Titulo}[1]{
+  \vspace*{1ex}\par\noindent\textbf{\large #1}\par
+}
+
+\newenvironmentx{Estructura}[2][2={estr}]{%
+  \par\vspace*{2ex}%
+  \TipoVariable{#1} \textbf{se representa con} \TipoVariable{#2}%
+  \par\vspace*{1ex}%
+}{%
+  \par\vspace*{2ex}%
+}%
+
+\newboolean{EstructuraHayItems}
+\newlength{\lenTupla}
+\newenvironmentx{Tupla}[1][1={estr}]{%
+    \settowidth{\lenTupla}{\hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($}%
+    \addtolength{\lenTupla}{\parindent}%
+    \hspace*{3mm}donde \TipoVariable{#1} es \TipoVariable{tupla}$($%
+    \begin{minipage}[t]{\linewidth-\lenTupla}%
+    \setboolean{EstructuraHayItems}{false}%
+}{%
+    $)$%
+    \end{minipage}
+}
+
+\newcommandx{\tupItem}[3][1={\ }]{%
+    %\hspace*{3mm}%
+    \ifthenelse{\boolean{EstructuraHayItems}}{%
+        ,#1%
+    }{}%
+    \emph{#2}: \TipoVariable{#3}%
+    \setboolean{EstructuraHayItems}{true}%
+}
+
+\newcommandx{\RepFc}[3][1={estr},2={e}]{%
+  \tadOperacion{Rep}{#1}{bool}{}%
+  \tadAxioma{Rep($#2$)}{#3}%
+}%
+
+\newcommandx{\Rep}[3][1={estr},2={e}]{%
+  \tadOperacion{Rep}{#1}{bool}{}%
+  \tadAxioma{Rep($#2$)}{true \ssi #3}%
+}%
+
+\newcommandx{\Abs}[5][1={estr},3={e}]{%
+  \tadOperacion{Abs}{#1/#3}{#2}{Rep($#3$)}%
+  \settominwidth{\hangindent}{Abs($#3$) \igobs #4: #2 $\mid$ }%
+  \addtolength{\hangindent}{\parindent}%
+  Abs($#3$) \igobs #4: #2 $\mid$ #5%
+}%
+
+\newcommandx{\AbsFc}[4][1={estr},3={e}]{%
+  \tadOperacion{Abs}{#1/#3}{#2}{Rep($#3$)}%
+  \tadAxioma{Abs($#3$)}{#4}%
+}%
+\newcommand{\DRef}{\ensuremath{\rightarrow}}
+
+
+\newcommandx{\Algoritmo}[4]{%
+	\noindent\TipoFuncion{#1}{#2}{#3}
+	\begin{algorithmic}
+	#4
+	\end{algorithmic}
+}%
+
+\newcommand{\nom}[1]{\NombreFuncion{#1}}
+
+\newcommand{\comp}[1]{\hfill \ensuremath{O(#1)}}
+\newcommand{\compTot}[1]{\hfill \textbf{Complejidad Total: }\ensuremath{O(#1)}}
+
+\begin{document}
+
+\section{M\'odulo DiccTrie(string,$\alpha$)}
+
+\begin{Interfaz}
+
+  \textbf{se explica con}: \tadNombre{Diccionario(string,$\alpha$)}.
+
+  \textbf{g\'eneros}: \TipoVariable{diccTrie}, \TipoVariable{itClavesDiccTrie(String)}.
+
+  \Titulo{Operaciones b\'asicas de DiccTrie}
+  
+\InterfazFuncion{Vacio}{}{diccTrie(string,$\alpha$)}%
+  {$res$ \igobs vacio()}%
+  [$O(1)$]
+  [Genera un diccionario vac\'io]
+
+\InterfazFuncion{Definido?}{\In{s}{string}, \In{dicc}{diccTrie(string,$\alpha$)}}{bool}%
+  {$res$ \igobs def?($s$,$dicc$)}%
+  [$O(|s|)$]
+  [Devuelve true si y s\'olo si $s$ est\'a definido en el diccionario $dicc$.]
+  [No se hace aliasing con respecto a la variable $s$.]
+
+\InterfazFuncion{Definir}{\In{s}{string},\In{info}{$\alpha$},\Inout{dicc}{diccTrie(string,$\alpha$)}}{}
+  [$dicc$ \igobs $dicc_0$]
+  {$dicc$ \igobs definir($s$,$info$,$dicc$)}
+  [$O(|s|)$]
+  [Define la clave $s$ con el significado $info$ en el diccionario $dicc$.]
+  [No se hace aliasing con respecto a las variables $s$ e $info$.]
+  
+\InterfazFuncion{Claves}{\In {dicc}{diccTrie(string,$\alpha$)}}{itClavesDiccTrie}
+  {$res$ \igobs claves($dicc$)}
+  [$O(1)$]
+  [Devuelve el conjunto de claves del diccionario.]
+  [$res$ no es modificable.]
+  
+\InterfazFuncion{Obtener}{\In{s}{string}, \In{dicc}{diccTrie(string,$\alpha$)}}{$\alpha$}%
+  [def?($s$,$dicc$)]
+  {alias($res$ \igobs obtener($s$,$dicc$))}%
+  [$O(|s|)$]
+  [Devuelve el significado de la clave $s$ en $dicc$.]
+  [$res$ se pasa por referencia, y es modificable.]
+  
+\InterfazFuncion{CrearItDicc}{\In{c}{conj(string)}}{itClavesDiccTrie(string)}
+  {alias(esPermutacion?(SecuSuby($res$), $c$))}
+  [$O(1)$]
+  [Crea un nuevo iterador sobre el conjunto pasado por par\'ametro.]
+  [El iterador se invalida si se elimina el elemento siguiente del iterador. Además Siguientes($res$) podr\'ia cambiar completamente ante cualquier
+operaci\'on que modifique el conjunto.]
+  
+\InterfazFuncion{HaySiguiente?}{\In{it}{itClavesDiccTrie(string)}}{bool}
+  {$res$ \igobs haySiguiente($it$)}
+  [$O(1)$]
+  [Devuelve $true$ si en el conjunto quedan elementos para iterar.]
+  
+  \newpage
+  
+\InterfazFuncion{Siguiente}{\In{it}{itClavesDiccTrie(string)}}{string}
+  {alias($res$ \igobs Siguiente($it$))}
+  [$O(1)$]
+  [Devuelve el elemento al que apunta el iterador.]
+  [$res$ no es modificable.]
+ 
+  
+\InterfazFuncion{Avanzar}{\Inout{it}{itClavesDiccTrie(string)}}{}
+  {$res$ \igobs Avanzar($it$)}
+  [$O(1)$]
+  [Avanza a la posici\'on siguiente del iterador.]
+  
+\end{Interfaz}
+
+
+%(DESPUES HAY QUE VER QUE CAMBIA EN REP, ABS, Y ALGORITMOS)
+
+\begin{Representacion}
+  
+  \Titulo{Representaci\'on de DiccTrie}
+
+  \begin{Estructura}{diccTrie}[estrT]
+    \begin{Tupla}[estrT]
+     \tupItem{claves}{conj(string)}
+     \tupItem{d}{diccT}
+    \end{Tupla}
+
+    \begin{Tupla}[diccT]
+      \tupItem{hijos}{arreglo(puntero(diccT))}%
+      \tupItem{dato}{puntero($\alpha$)}%
+    \end{Tupla}
+    
+  \end{Estructura}
+
+  \begin{Estructura}{itClavesDiccTrie}[icdt]
+    donde icdt es Tupla(iter: itConj(string))
+  \end{Estructura}
+
+  
+  
+  \begin{enumerate}
+		\item El tama\~no de $d.hijos$ es 256 (codigo ASCII).
+		\item Para toda posici\'on del arreglo $d.arbol.hijos$ est\'a definida.
+		\item Los punteros en $d.arbol.hijos$ no pueden referise a un nodo anterior de la estructura.
+		\item $d.claves$ contiene el conjunto de claves de todo el arbol.
+	\end{enumerate}
+
+
+  \Rep[diccT][d]{(1) tam(d.arbol.hijos)=256 $\yluego$ \newline
+   	 (2)($\forall$ $i$:nat) $i$ $\leq$ 255 $\Rightarrow$ definido?($d$.arbol.hijos, $i$) $\land$ \newline
+  	 (3)sinRepetidos(punterosNoNulos($d$.arbol.hijos)) $\land$ \newline
+		 (4) $d$.claves = ObtenerClaves($d$.arbol)
+}
+
+\parskip = 5pt
+
+\tadOperacion{punterosNoNulos}{arreglo(puntero(diccT))}{arreglo(puntero(diccT))}{}
+\tadAxioma{punterosNoNulos($a$)}{pNNAux($a$,0)}\
+
+\tadOperacion{pNNAux}{arreglo(puntero(diccT)),nat}{arreglo(puntero(diccT))}{}
+\tadAxioma{pNNAux($a$,$n$)}{\IF $n$ = 256 THEN <> ELSE {\IF a[$n$]=NULL THEN pNNAux(a,$n$ + 1) ELSE a[$n$]$\bullet$pNNAux(a,$n$ + 1) $\&$ pNNAux(a[$n$]$\rightarrow$hijos,0) FI} FI}\
+	
+\tadOperacion{ObtenerClaves}{diccT}{conj(string)}{}
+\tadAxioma{ObtenerClaves($d$)}{UnirConjuntos(ObtenerClavesAux($d$, 0))}\
+
+\newpage
+
+\tadOperacion{ObtenerClavesAux}{diccT, nat}{conj(conj(secu(char)))}{}
+\tadAxioma{ObtenerClavesAux($d$, $i$)}{\IF $i$ $\leq$ 255 THEN Ag(TodasLasClaves(*(d.hijos)[i], ord$^{-1}$($i$), 0) , ObtenerClavesAux($d$, $i$ + 1)) ELSE $\emptyset$ FI}\
+
+%VER CON AXEEEL!
+
+
+
+ \tadOperacion{TodasLasClaves}{diccT, char, nat}{conj(secu(char))}{}
+ \tadAxioma{TodasLasClaves($d$, $ch$, $i$)}{\IF $¬$($d$.hijos[$i$] = NULL) $\wedge$ ($d$.dato = NULL) $\wedge$ $i$ $\leq$ 255 THEN TodasLasClaves(*($d$.hijos)[$i$], ch $\bullet$ ord$^{-1}$($i$), $i$ + 1) 
+ ELSE {\IF $¬$($d$.hijos[$i$] = NULL) $\wedge$ $¬$($d$.dato = NULL) THEN Ag($ch$ $\bullet$ ord$^{-1}$($i$) $\bullet$ <>, TodasLasClaves(*(d.hijos)[$i$], $ch$ $\bullet$ ord$^{-1}$($i$), 0)) ELSE
+ {\IF ($d$.hijos[$i$] = NULL) $\wedge$ $¬$($d$.dato = NULL) THEN Ag($ch$ $\bullet$ ord$^{-1}$($i$) $\bullet$ <>, $\emptyset$) ELSE $\emptyset$ FI}FI}FI}\
+
+
+ \tadOperacion{UnirConjuntos}{conj(conj(secu(char)))}{conj(secu(char))}{}
+ \tadAxioma{UnirConjuntos($cc$)}{\IF $¬$($\emptyset$?($cc$)) THEN dameUno($cc$) $\cup$ UnirConjuntos(sinUno($cc$)) ELSE $\emptyset$ FI}\
+
+
+\Abs[diccT]{diccTrie}[d]{$d_0$}{($\forall$ s:string) def?(s,$d_0$) $\Leftrightarrow$ hayCamino(s,$d_0$) $\land_L$ def?(s,$d_0$) $\Rightarrow_L$ \newline
+  	obtener(s,$d_0$) = dameDato(s,$d_0$)}
+ 
+
+\tadOperacion{hayCamino}{string,diccT}{bool}{}
+\tadAxioma{hayCamino(s,d)}{auxHayCamino(StringToArray(s),0,d)}\
+
+
+\tadOperacion{auxHayCamino}{arreglo(char),nat,diccT}{bool}{}
+\tadAxioma{auxHayCamino(s,i,d)}{\IF i = tam(s) THEN $\neg$(d$\rightarrow$dato = NULL) ELSE {\IF s[i]=NULL THEN false ELSE auxHayCamino(s,i+1,d$\rightarrow$hijos[CharToInt(s[i])]) FI} FI}\
+
+\tadOperacion{dameDato}{string /s,diccT /d}{$\alpha$}{hayCamino(s,d)}
+\tadAxioma{dameDato(s,d)}{dameDatoAux(StringToArray(s),0,d)}\
+
+\tadOperacion{dameDatoAux}{arreglo(char),nat,diccT}{$\alpha$}{}
+\tadAxioma{dameDatoAux(s,n,d)}{\IF n = tam(s) THEN *(d.dato) ELSE dameDatoAux(s,n+1,d.hijos[CharToInt(s[n])]) FI}\
+
+
+\end{Representacion}
+
+\newpage
+
+\begin{Algoritmos}
+\parskip=5 pt
+
+%Revisar que le paso como parametros a los algoritmos!!!
+% Especificamente, el nombre del tipo diccTrie
+
+
+\Algoritmo{iVacio}{}{puntero(diccT)}{
+	\State arreglo(puntero(diccT)) $sons$ $\gets$ \nom{CrearArreglo}(256) \comp{1}
+	\State int $i$ $\gets$ 0 \comp{1}
+	\While{$i$ < 256} \comp{1}
+		\State sons[$i$] $\gets$ NULL \comp{1}
+		\State $i$ $\gets$ $i$ + 1 \comp{1}
+	\EndWhile \comp{1}
+	\State $res$.claves $\gets$ Vacio() \comp{1} 
+	\State $res$.arbol.hijos $\gets$ sons \comp{1} 
+	\State $res$.dato $\gets$ NULL	\comp{1}
+	\State \compTot{1}
+}\
+
+Justificaci\'on de la complejidad: Crear un arreglo de 256 posiciones es $O(256)$, pero al ser esta una constante, la complejidad de crear el arreglo es $O(1)$. Lo mismo pasa con el while que itera 256 veces, la complejidad es $256*O(1)$ que es igual a $O(1)$. Luego por ser suma de$O(1)$, la complejidad total es $O(1)$.\\
+
+
+\Algoritmo{iDefinido?}{\In{s}{string}, \In{d}{estrT}}{bool}{
+	\State arreglo(char) $word$ $\gets$ \nom{StringToArray}($s$) \comp{|s|}
+	\State int $i$ $\gets$ 0 \comp{1}
+	\State puntero(diccTrie) $recorre$ $\gets$ $\&d$.arbol \comp{1} 
+	\While{$\neg$($recorre$ = NULL) $\land$ $i$ < \nom{Tam}(s)} \comp{|s|}
+		\State $recorre$ $\gets$ $recorre$ $\rightarrow$ hijos[\nom{Ord}(word[$i$])] \comp{1}
+	\EndWhile 
+	\State $res$ $\gets$ $\neg$(recorre = NULL) \comp{1}
+	\State \compTot{|s|}
+}\
+
+Justificaci\'on de la complejidad: $stringToArray(s)$ tiene complejidad $|s|$, y el while recorre el arreglo creado por esta funci\'on, por lo cual itera $|s|$ veces. Como en cada iteraci\'on, realiza una operaci\'on con complejidad $O(1)$, la complejidad del while es $|s|*O(1)$, que es igual a $O(|s|)$. Luego, como el resto de las operaciones tienen complejidad $O(1)$, la complejidad total es $O(|s|)$.\\
+
+
+\Algoritmo{iDefinir}{\In{s}{string}, \In{info}{$\alpha$}, \Inout{d}{puntero(diccT)}}{}{
+	
+	\State arreglo(char) $word$ $\gets$ \nom{StringToArray}($s$) \comp{|s|}
+	\State int $i$ $\gets$ 0 \comp{1}
+	\State puntero(diccT) $recorre$ $\gets$ $\&d$.arbol \comp{1} 
+	\While{$i$ < \nom{Tam}($s$)} \comp{|s|}
+		\If{($recorre$ $\rightarrow$ hijos[\nom{Ord}(word[$i$])]) = NULL} \comp{1}
+			\State puntero(diccT) $nuevo$ $\gets$ \nom{Vacio}() \comp{1}
+			\State ($recorre$ $\rightarrow$ hijos[\nom{Ord}(word[$i$])) $\gets$ $nuevo$ \comp{1}
+		\EndIf
+		\State $recorre$ $\gets$ ($recorre$ $\rightarrow$ hijos[\nom{Ord}(word[$i$])]) \comp{1} 
+	\EndWhile
+	\State ($recorre$ $\rightarrow$ $dato$) $\gets$ $\&info$ \comp{1}
+	\State \compTot{|s|}
+}\
+
+Justificaci\'on de la complejidad: $stringToArray(s)$ tiene complejidad $|s|$, y el while recorre el arreglo creado por esta funci\'on, por lo cual itera $|s|$ veces. Como en cada iteraci\'on, realiza operaciones con complejidad $O(1)$, la complejidad del while es $O(|s|)$. Luego, como el resto de las operaciones tienen complejidad $O(1)$, la complejidad total es $O(|s|)$.\\
+
+
+\newpage
+
+\Algoritmo{iClaves}{\In{d}{estrT}}{icdt}{
+   \State conjunto(string) $c$ $\gets$ $\&d$.claves \comp{1}
+   \State $res$ $\gets$ \nom{CrearItDicc}($c$) \comp{1}
+   \State \compTot {1}
+}
+
+\Algoritmo{iObtener}{\In{s}{string}, \In{d}{puntero(diccT)}}{$\alpha$}{
+	\State arreglo(char) $word$ $\gets$ \nom{StringToArray}($s$) \comp{|s|}
+	\State int $i$ $\gets$ 0 \comp{1}
+	\State puntero(diccT) $recorre$ $\gets$ $\&d$.arbol \comp{1} 
+	\While{$i$ < \nom{Tam}($s$)} \comp{|s|}
+		\State $recorre$ $\gets$ ($recorre$ $\rightarrow$ hijos[\nom{Ord}(word[i])]) \comp{1}
+	\EndWhile
+	\State $res$ $\gets$ *($recorre$ $\rightarrow$ dato) \comp{1}
+	\State \compTot{|s|}
+}\
+
+Justificaci\'on de la complejidad: $stringToArray(s)$ tiene complejidad $|s|$, y el while recorre el arreglo creado por esta funci\'on, por lo cual itera $|s|$ veces. Como en cada iteraci\'on, realiza una operaci\'on con complejidad $O(1)$, la complejidad del while es $|s|*O(1)$, que es igual a $O(|s|)$. Luego, como el resto de las operaciones tienen complejidad $O(1)$, la complejidad total es $O(|s|)$.\\
+
+\Algoritmo{iCrearItDicc}{\In{c}{conj(string)}}{icdt}{
+	\State itClavesDiccTrie(string) $it$ $\gets$ \nom{CrearIt}(c) \comp{1}
+	\State $res$.iter $\gets$ $it$ \comp{1}
+	\State \compTot{1}
+}
+
+\Algoritmo{iHaySiguiente?}{\In{it}{icdt}}{bool}{
+	\State $res$ $\gets$ \nom{HaySiguiente}($icdt$.iter) \comp{1}
+	\State \compTot{1}
+}
+\Algoritmo{iSiguiente}{\In{it}{icdt}}{$\alpha$}{
+	\State $res$ $\gets$ \nom{Siguiente}($icdt$.iter) \comp{1}
+	\State \compTot{1}
+}
+ 
+\Algoritmo{iAvanzar}{\Inout{it}{icdt}}{}{
+	\State \nom{Avanzar}($icdt$.iter) \comp{1}
+	\State \compTot{1}
+}
+
+
+
+\end{Algoritmos}
+
+\begin{Servicios Usados}
+ \begin{itemize}
+	\item \nom{CrearArreglo}(k) con k constante, debe ser $O(1)$.
+	\item \nom{StringToArray}($s$) debe ser $O(|s|)$ .
+	\item \nom{Ord}($c$) debe ser $O(1)$.
+	\item \nom{Tam}($a$) debe ser $O(1)$.
+\end{itemize}
+ 
+ 
+\end{Servicios Usados}
+
+
+\newpage
+
+\section{M\'odulo ArbolCategorias}
+
+
+\begin{Interfaz}   
+
+ \textbf{se explica con}: \tadNombre{ArbolCategorias}, \tadNombre{Iterador Unidireccional}, \tadNombre{Tupla(nat, nat, string, puntero(nodoCat), conj(puntero(nodoCat))}. 
+  
+  \textbf{g\'eneros}: \TipoVariable{acat, nodoCat, itCategorias(puntero(nodoCat))}.
+  
+  \Titulo{Operaciones del Arbol}
+  
+
+  \InterfazFuncion{Nuevo}{\In{c}{categoria}}{acat}
+  [$¬$vacia?($c$)]
+  {$res$ \igobs nuevo($c$)}
+  [$O(|c|)$]
+  [Crea un nuevo \'arbol de categorias.]
+  [No se hace aliasing con respecto a $c$.]
+
+  
+  \InterfazFuncion{Agregar}{\Inout{ac}{acat}, \In{c}{categoria}, \In{hijo}{categoria}}{}
+  [$ac$ \igobs $ac_0$ $\land$ esta?($c$,$ac_0$) $\land$ $¬$vacia?($hijo$) $\land$ $¬$esta?($hijo$,$ac_0$)]
+  {$ac$ \igobs agregar($ac_0$, $c$, $h$)} 
+  [$O(|c| + |hijo|)$]
+  [Agrega una categor\'ia al \'arbol de categorias.]
+  [No se hace aliasing con respecto a $c$ y a $hijo$.]
+ 
+  
+  \InterfazFuncion{Categorias}{\In{ac}{categoria}}{itCategorias}
+  {$res$ \igobs categorias($ac$)}
+  [$O(1)$]
+  [Dado un \'arbol, devuelve todas sus categor\'ias.]
+  [$res$ no es modificable.]
+  
+  \InterfazFuncion{Raiz}{\In{ac}{acat}}{categoria}
+  {$res$ \igobs raiz($ac$)}
+  [$O(1)$] 
+  [Devuelve la ra\'iz del arbol.]
+  [$res$ no es modificable.]
+
+
+  \InterfazFuncion{Padre}{\In{ac}{acat}, \In{hijo}{categoria}}{categoria}
+  [esta?($hijo$,$ac$) $\land$  $¬$($hijo$ \igobs  raiz($ac$))]
+  {$res$ \igobs padre($ac$,$h$)}
+  [$O(|hijo| + |padre|)$, donde $padre$ es \nom{Padre}($ac$,$hijo$).]
+  [Devuelve el nodo superior de la categoria pasada por par\'ametro.]
+  [$res$ no es modificable y no se hace aliasing con respecto a $hijo$.]
+  
+  
+  \InterfazFuncion{Id}{\In{ac}{acat}, \In{c}{categoria}}{nat}
+  [esta?($c$,$ac$)]
+  {$res$ $\igobs$ id($ac$,$c$)}
+  [$O(|c|)$]
+  [Dada una categor\'ia, devuelve su n\'umero de id.]
+  [no se hace aliasing con respecto a $c$.]
+  
+  
+  \InterfazFuncion{Altura}{\In{ac}{acat}}{nat}
+  {$res$ \igobs altura($ac$)}
+  [$O(1)$]
+  [Devuelve la altura del \'arbol.]
+  
+  \newpage
+  
+  \InterfazFuncion{Esta?}{\In{c}{categoria}, \In{ac}{acat}}{bool}
+  {$res$ \igobs esta?($c$,$ac$)}
+  [$O(|c|)$]
+  [Devuelve $true$ si la categor\'ia pertenece al \'arbol pasado por par\'ametro.]
+  [no se hace aliasing con respecto a $c$.]
+
+  
+  \InterfazFuncion{EsSubCategorias}{\In{ac}{acat}, \In{pa}{categoria}, \In{hi}{categoria}}{bool}
+  [esta? ($pa$, $ac$) $\wedge$ esta?($hi$,$ac$)]
+  {$res$ \igobs esSubcategoria($ac$,$pa$,$hi$)}
+  [$O(|hi| + h)$, donde $h$ es la altura del \'arbol]
+  [Dada una categor\'ia $pa$ y una categoria $hi$ devuelve $true$ si $hi$ es subcategor\'ia de $pa$.]
+  [no se hace aliasing con respecto a $pa$ e $hi$.]
+  
+  
+  \InterfazFuncion{AlturaCategoria}{\In{ac}{acat},\In{c}{categoria}}{nat}
+  [esta($c$,$ac$)]
+  {$res$ \igobs alturaCategoria($ac$,$c$)}
+  [$O(|c|)$]
+  [Devuelve la altura de una categor\'ia.]
+  [no se hace aliasing con respecto a $c$.]  
+
+  \InterfazFuncion{Hijos}{\In{ac}{acat},\In{c}{categoria}}{itCategorias}
+  [esta?($c$,$ac$)]
+  {$res$ \igobs hijos($ac$,$c$)}
+  [$O(|c|)$]
+  [Devuelve las categor\'ias hijas de $c$.]
+  [no se hace aliasing con respecto a $c$ y $res$ no es modificable.]
+
+
+  \Titulo{Operaciones del Nodo}
+
+  \InterfazFuncion{IdNodo}{\In{n}{nodoCat}}{nat}
+  {$res$ \igobs $\Pi_1$($n$)}
+  [$O(1)$]
+  [Dado un nodo, devuelve el id.]
+
+  \InterfazFuncion{AlturaNodo}{\In{n}{nodoCat}}{nat}
+  {$res$ \igobs $\Pi_2$($n$)}
+  [$O(1)$]
+  [Dado un nodo, devuelve la altura.]
+  
+  \InterfazFuncion{CategoriaNodo}{\In{n}{nodoCat}}{categoria}
+  {$res$ \igobs $\Pi_3$($n$)}
+  [$O(1)$]
+  [Dado un nodo, devuelve el n\'ombre de la categor\'ia]
+  [$res$ no es modificable.]
+
+  \InterfazFuncion{NodoPadre}{\In{n}{nodoCat}}{nodoCat}
+  {$res$ \igobs $\Pi_4$($n$)}
+  [$O(1)$]
+  [Dado un nodo, devuelve al nodo padre.]
+  [$res$ no es modificable.]
+  
+  \newpage
+  
+  \InterfazFuncion{TienePadre}{\In {n}{nodoCat}}{bool}
+  {$res$ \igobs $\Pi_1$($n$) > 1}
+  [$O(1)$]
+  [Devuelve $true$ si el nodo pasado por parametro tiene padre]
+  
+%   \InterfazFuncion{HijosNodo}{\In{n}{nodoCat}}{conj(categoria)}
+%   {$res$ \igobs $\Pi_5$($n$)}
+%   [$O(1)$]
+%   [Dado un nodo, devuelve el conjunto de sus hijos.]
+  
+  \Titulo{Operaciones del Iterador}
+  
+  \InterfazFuncion{CrearItConj}{\In{c}{conj(puntero(nodoCat))}}{itCategorias}
+  {alias(esPermutacion?(SecuSuby($res$), $c$))}
+  [$O(1)$]
+  [Crea un nuevo iterador sobre el conjunto pasado por par\'ametro.]
+  [El iterador se invalida si se elimina el elemento siguiente del iterador. Además Siguientes($res$) podr\'ia cambiar completamente ante cualquier
+operaci\'on que modifique el conjunto.]
+
+\InterfazFuncion{HaySiguiente?}{\In{it}{itCategorias}}{bool}
+  {$res$ \igobs haySiguiente($it$)}
+  [$O(1)$]
+  [Devuelve $true$ si en el iterador quedan elementos para avanzar.]
+  
+\InterfazFuncion{Siguiente}{\In{it}{itCategorias}}{nodoCat}
+  {alias($res$ \igobs Siguiente($it$))}
+  [$O(1)$]
+  [Devuelve el elemento al que apunta el iterador.]
+  [$res$ no es modificable.]
+
+  
+\InterfazFuncion{Avanzar}{\Inout{it}{itCategorias}}{}
+  {$res$ \igobs Avanzar($it$)}
+  [$O(1)$]
+  [Avanza a la posici\'on siguiente del iterador.]
+  
+% \InterfazFuncion{CrearItCategorias}{\In{c}{categoria}, \In{ac}{acat}}{itCategorias(nodoCat)}
+%   [$c$ $\in$ categorias($ac$)]
+%   {$res$ \igobs crearIt(secu($\left<{id(ac,c), alturaCategoria(ac,c), c, padre(ac,c), hijos(ac,c)}\right>$))}
+%   [$O(|c| + h)$ donde $h$ es la altura del \'arbol.]
+%   [Crea un iterador de la categor\'ia $c$ y su padre]
+%   
+% \InterfazFuncion{HayMasCategorias}{\In{it}{itLista(nodoCat)}}{bool}
+%   {$res$ \igobs hayMas($it$)}
+%   [$O(1)$]
+%   [Devuelve true si hay m\'as categor\'ias para recorrer]
+% 
+% \InterfazFuncion{AvanzarItCategorias}{\Inout{it}{itLista(nodoCat)}}{}
+%   [$it$ = $it_0$ $\wedge$ hayMasItCategorias?($it$)]
+%   {$it$ \igobs avanzar($it_0$)}
+%   [$O(1)$]
+%   [Avanza el iterador]
+%   
+% \InterfazFuncion{SiguienteItCategorias}{\In{it}{itLista(nodoCat)}}{nodoCat}
+%   [hayMasItCategorias($it$)]
+%   {esAlias($res$,siguiente($it$))}
+%   [$O(1)$]
+%   [Devuelve el elemento al que el iterador esta apuntando]
+
+\end{Interfaz}
+
+ ~
+ 
+
+ 
+%  \begin{tad}{\tadNombre{NodoCat}
+%  
+%  \parskip = 5 pt
+%  
+%  
+%  	\tadGeneros{nodoCat}
+%  	\tadUsa{\tadNombre{ArbolCategorias}}
+%  	\tadIgualdadObservacional{n_{1}}{n_{2}}{nodoCat}
+%  {}
+%  
+%  	\tadObservadores
+%  
+%  		\tadOperacion{Siguientes}{itUniConj($\alpha$)}{conj($\alpha$)}{}
+%  		\tadOperacion{Siguientes}{itUniConj($\alpha$)}{conj($\alpha$)}{}
+%  		\tadOperacion{Siguientes}{itUniConj($\alpha$)}{conj($\alpha$)}{}
+%  		\tadOperacion{Siguientes}{itUniConj($\alpha$)}{conj($\alpha$)}{}
+%  		\tadOperacion{Siguientes}{itUniConj($\alpha$)}{conj($\alpha$)}{}
+%  		\tadOperacion{Siguientes}{itUniConj($\alpha$)}{conj($\alpha$)}{}
+%  
+%  	\tadGeneradores
+%  
+%  		\tadOperacion{crear}{acat}{nodoCat}{}
+%  		\tadOperacion{agregarHijo}{acat}{nodoCat}{}
+%  
+%  	\tadOtrasOperaciones
+%  
+%  		\tadOperacion{haySiguiente?}{itUniConj($\alpha$)}{bool}{}
+%  		\tadOperacion{Siguiente}{itUniConj($\alpha$) /it}{$\alpha$}{haySiguiente?(it)}
+%  		\tadOperacion{Avanzar}{itUniConj($\alpha$) /it}{itUniConj($\alpha$)}{haySiguiente?(it)}
+%  
+%  	\tadAxiomas
+%  	
+%  	\tadAxioma{Siguientes(CrearItConj(c))}{c}
+%  	\tadAxioma{haySiguiente?(it)}{$\neg\emptyset$?(Siguientes(it))}
+%  	\tadAxioma{Siguiente(it)}{dameUno(Siguientes(it))}
+%  	\tadAxioma{Avanzar(it)}{CrearItConj(sinUno(Siguientes(it)))}
+%  
+%  }
+% 
+% \end{tad}
+
+\begin{Representacion}
+ 
+  \Titulo{Representaci\'on de Arbol de Categorias}
+
+  \begin{Estructura}{acat}[estrAc]  
+    \begin{Tupla}[estrAc]
+      \tupItem{raiz}{categoria}
+      \tupItem{tr}{diccTrie(categoria,nodoCat)} \newline
+      \tupItem{ultimoId}{nat}
+      \tupItem{alturaArbol}{nat}
+      \tupItem{nodos}{conjunto(puntero(nodoCat))}
+    \end{Tupla}\
+  \end{Estructura}
+  
+  \begin{Estructura}{nodoCat}[estrNodo]      
+    \begin{Tupla}[nodoCat]
+      \tupItem{id}{nat}
+      \tupItem{alturaNodo}{nat}
+      \tupItem{cat}{categoria}
+      \tupItem{padre}{puntero(nodoCat)} \newline
+      \tupItem{hijos}{conj(puntero(nodoCat))}
+    \end{Tupla}
+    
+     
+  \end{Estructura} \
+    
+    \Titulo{Invariante de representaci\'on en castellano}
+    
+\begin{enumerate}
+	\item $Raiz$ est\'a en las claves de $tr$.
+	\item Para todo $n$ en $nodos$, $\&n$ esta en el conjunto de significados de $tr$.
+	\item El tama\~no de $nodos$ es igual al tama\~no de el conjunto de significados de $tr$.
+	\item Dada una categor\'ia, en su significado, cat es ella misma.
+	\item El padre de la raiz apunta a NULL.
+	\item Dada una categor\'ia, en el significado de $tr$, $cat$ de su padre debe estar en las claves de $tr$.
+	\item Dada una categor\'ia, en el significado de $tr$, para cada uno de sus hijos (si el conjunto no es vacio), al buscar su significado en $tr$, $cat$ debe estar en claves de $tr$.
+	\item Dada una categor\'ia A, en el significado de $tr$, $padre$, debe tener a A entre sus hijos, la altura de A es la altura del padre + 1 y el id del padre es estrictamente menor que el de A.
+	\item Dada una categor\'ia A, en el significado de $tr$, para cada elemento de $hijos$, A aparece como padre, su altura es la altura de A + 1 y el id es estrictamente mayor que el de A.
+	\item Existe alguna categor\'ia tal que, en el significado de $tr$, $alturaNodo$ es igual a $alturaArbol$, y para toda otra categor\'ia, en el significado de $tr$, $alturaNodo$ es menor o igual a $alturaArbol$.
+	\item Existe una categor\'ia tal que, en el significado de $tr$, $id$ es igual a $ultimoId$, y para toda otra categor\'ia, en el significado de $tr$, $id$ es menor estricto que $ultimoId$. 
+\end{enumerate}
+
+     
+    \Rep[estrAc][a]{
+    \parskip=5 pt
+(1) $a$.raiz $\in$ claves($a$.tr) $\wedge$ \newline \\
+(2) ($\forall$ $n$: puntero(nodoCat)) $n$ $\in$ $a$.nodos $Rightarrow$ ($\&n$ $\in$ significados(claves($a$.tr), $a$.tr)) $\wedge$ \newline \\
+(3) $\#$($a$.nodos) = $\#$(significados(claves($a$.tr), $a$.tr) $\wedge$ \newline \\
+(4) ($\forall$ c: categoria) def?(c, $a$.tr) $\Rightarrow$ obtener(c,$a$.tr).cat = c $\wedge$ \newline \\
+(5) obtener($a$.raiz, $a$.tr).padre = NULL $\yluego$ \newline \\
+(6) ($\forall$ c: categoria) def?(c, $a$.tr) $\Rightarrow$ (obtener(c,$a$.tr).padre $\rightarrow$ cat) $\in$ claves($a$.tr) $\yluego$ \newline \\
+(7) ($\forall$ c: categoria) def?(c, $a$.tr) $\Rightarrow$ (obtener(c,$a$.tr).hijos).cat $\subseteq$ claves($a$.tr) $\yluego$ \newline \\
+(8) ($\forall$ c: categoria) def?(c, $a$.tr) $\Rightarrow$ ((c $\in$ (obtener(c,$a$.tr).padre $\rightarrow$ hijos)) $\wedge$ \newline
+((obtener(c,$a$.tr).alturaNodo) = (obtener(c,$a$.tr).padre $\rightarrow$ alturaNodo) + 1) $\wedge$ \newline ((obtener(c,$a$.tr).id) > (obtener(c,$a$.tr).padre $\rightarrow$ id))) \newline \\
+(9) ($\forall$ c: categoria) def?(c, $a$.tr) $\Rightarrow$ ($\forall$ c$_{h}$: categoria) (c$_{h}$ $\in$ obtener(c,$a$.tr).hijos) $\Rightarrow$ \newline 
+((obtener(c$_{h}$,$a$.tr).padre $\rightarrow$ cat) = c) $\wedge$ ((obtener(c,$a$.tr).alturaNodo) = \newline (obtener(c$_{h}$,$a$.tr).alturaNodo) + 1) $\wedge$ ((obtener(c,$a$.tr).id) < (obtener(c$_{h}$,$a$.tr).id))) \newline \\
+(10) ($\exists$ c: categoria) def?(c, $a$.tr) $\Rightarrow$ ((obtener(c,$a$.tr).alturaNodo = $a$.alturaArbol) $\wedge$ \newline
+(($\forall$ c$_1$: categoria)(def?(c$_1$,$a$.tr) $\wedge$ c $\neq$ c$_1$) $\Rightarrow$ (obtener(c$_1$,$a$.tr).alturaNodo) $\leq$ $a$.alturaArbol)) $\wedge$ \newline \\
+(11) ($\exists$ c: categoria) def?(c,$a$.tr) $\Rightarrow$ ((obtener(c,$a$.tr).id = $a$.ultimoId) $\wedge$ ($\forall$ c$_1$: categoria)(def?(c$_1$,$a$.tr) \newline 
+$\wedge$ c $\neq$ c$_1$) $\Rightarrow$ (obtener(c$_1$,$a$.tr).id < $a$.ultimoId))
+}
+
+~
+\\
+
+\tadOperacion{significados}{conj(string) /c , dicc(string, nodoCat)/d }{bool}{$c = claves(d)$}
+\tadAxioma{significados(c,d)}{\IF $c$ = $\emptyset$ THEN $\emptyset$ ELSE ag(significado(dameUno($c$),$d$), significados(sinUno($c$),$d$)) FI}\
+
+\Abs[estrAc]{acat}[e]{a}{raiz(a) = e.raiz $\wedge$ \newline
+categorias(a) = claves(e.tr) $\wedge$ \newline
+($\forall$ h: categoria) (h $\in$ categorias(a)) $\Rightarrow$ \newline
+((padre(a,h) = (obtener(h,e.tr).padre).cat) $\wedge$ (id(a,h) = obtener(h,e.tr).id))
+}
+
+\begin{Estructura}{itCategorias}[iuc]  
+  donde itCat es Tupla(c: itConj(puntero(nodoCat)))
+  \end{Estructura} 
+
+
+
+% \Titulo{Representaci\'on de Iterador Unidireccional Conjunto ($\alpha$)}
+% 
+%   \begin{Estructura}{itUniConj}[iuc]  
+%     \begin{Tupla}[iuc]
+%       \tupItem{conj}{conj($\alpha$)}
+%       \tupItem{actual}{$\alpha$}
+%       \tupItem{proximo}{puntero(iuc)}
+%     \end{Tupla}\    
+%      
+%   \end{Estructura} 
+%   
+% \begin{enumerate}
+% 	\item $Actual$ est\'a en $siguientes$.
+% 	\item Si el tama\~no de $siguientes$ es 1, $proximo$ apunta a NULL.
+% 	\item Sea i un itUniConj, si el tama\~no de $siguientes$ de i es mayor a 1, $siguientes$ del $proximo$ de i ser\'a $siguientes$ de i - \{$actual$\}
+% \end{enumerate}
+% 
+% \Rep[estrAc][a]{
+% (1)$i$.actual $\in$ $i$.siguientes $\wedge$ \newline
+% (2)(\#($i$.siguientes) = 1) $\Rightarrow$ ($i$.proximo = NULL) $\wedge$ \newline
+% (3)(\#($i$.siguientes) > 1) $\Rightarrow$ (($i$.proximo) $\rightarrow$ siguientes) = ($i$.siguientes - \{$i$.actual\})
+% }
+
+% ~
+% \\
+% 
+% \Abs[iuc]{irUniConj}[e]{i}{siguientes($i$) = $e$.siguientes}
+
+ 
+
+\end{Representacion}
+
+\newpage
+
+\begin{Algoritmos}
+\parskip=5 pt
+
+\Algoritmo{iNuevo}{\In{c}{string}}{estrAc}{
+	
+	\State $res$.raiz $\gets$ \nom{Copiar}($c$)  \comp{|c|}
+	\State $res$.ultimoId $\gets$ 1  \comp{1}
+	\State $res$.alturaArbol $\gets$ 1  \comp{1}
+	\State $res$.tr $\gets$ \nom{Vacio}()  \comp{1}
+	\State nodoCat $q$ $\gets$ \nom{CrearNodo}(1,1,$c$,NULL)  \comp{|c|}
+	\State definir($c$,$q$,$res$.tr)  \comp{|c|}
+	\State conjunto(puntero(nodoCat)) $cp$ $\gets$ \nom{Vacio}() \comp{1}
+	\State $res$.nodos $\gets$ \nom{Agregar}($cp$,$\&q$) \comp{1}
+	\State \compTot{|c|}
+}\
+
+Justificaci\'on de la complejidad: $Copar(c)$, $CrearNodo(1,1,c,NULL)$ y $Definir(c,q,res.tr)$ tienen complejidad, longitud del string que se les pasa por parametro (en este caso |c|). Y como el resto de las operaciones son $O(1)$, la complejidad total del algoritmo es $O(|c|)$.\\
+
+\Algoritmo{iAgregar}{\Inout{ac}{estrAc}, \In{c}{categoria}, \In{hijo}{categoria}}{}{
+  \State $ac$.ultimoId $\gets$ $ac$.ultimoId + 1  \comp{1}
+  \State NodoCat $q$ $\gets$ \nom{Obtener}($c$,$ac$.tr) \comp{|c|} 
+  \State nat $altNodo$  \comp{1}
+   
+  \If{($c$ == \nom{Raiz}($ac$))}  \comp{|c|} 
+    \State $altNodo$ $\gets$ 2  \comp{1}
+  \Else
+    \State $altNodo$ $\gets$ $q$.alturaNodo + 1  \comp{1}
+  \EndIf
+  
+  \If{($altNodo$ > $ac$.alturaArbol)}  \comp{1}
+    \State $ac$.alturaArbol $\gets$ $altNodo$  \comp{1}
+  \EndIf
+    
+  \State NodoCat $r$ $\gets$ \nom{CrearNodo}($ac$.ultimoId,$altNodo$,$hijo$,$\&q$)  \comp{|hijo|}
+  \State definir($hijo$,$r$,$ac$.tr)  \comp{|hijo|}
+  \State nodoCat $nodoHijo$ $\gets$ \nom{Obtener}($ac$.tr, $hijo$) \comp{|hijo|}
+  \State $ac$.nodos $\gets$ \nom{Agregar}($ac$.nodos,$\&nodoHijo$) \comp{1}
+  \State \nom{AgregarCatHija}($q$,$nodoHijo$)  \comp{1}
+  \State \compTot{|c| + |hijo|}
+}\
+
+%Justificaci\'on de la complejidad: la complejidad total se obtiene de sumar 6 veces $O(1)$, 2 veces $O(|c|)$ y 3 veces $O(|hijo|)$, por lo que la misma es $O(|c| + |hijo|)$\\
+
+\Algoritmo{iCategorias}{\In {ac}{estrAc}}{ItCategorias}{
+    \State $res$ $\gets$ \nom{CrearItCategorias}($ac$.nodos)  \comp{1}
+    \State \compTot{1}
+}
+      
+\Algoritmo{iRaiz}{\Inout{ac}{estrAc}}{categoria}{
+    \State $res$ $\gets$ \&$ac$.raiz  \comp{1}
+    \State \compTot{1}
+}
+
+\Algoritmo{iPadre}{\Inout{ac}{estrAc}, \In{hijo}{categoria}}{string}{
+    \State nodoCat $q$ $\gets$ \nom{Obtener}($hijo$,$ac$.tr)  \comp{|hijo|}
+    \State $q$ $\gets$ \nom{NodoPadre}($q$)  \comp{1}
+    \State $res$ $\gets$ \nom{CategoriaNodo}($q$)  \comp{1} %NO ES COPIAR(CATEGORIANODO(q))??
+    \State \compTot{|hijo|}
+}  
+     
+\Algoritmo{iId}{\Inout{ac}{estrAc}, \In{c}{categoria}}{nat}{
+    \State  nodoCat $q$ $\gets$ \nom{Obtener}($h$,$ac$.tr)  \comp{|c|}
+    \State $res$ $\gets$ \nom{IdNodo}(q) \comp{1}
+    \State \compTot{|c|}
+}
+	
+\Algoritmo{iAltura}{\In{ac}{estrAc}}{nat}{
+    \State $res$ $\gets$ $ac$.AlturaArbol  \comp{1}
+    \State \compTot{1}
+}
+
+\Algoritmo{iEsta}{\In{ac}{estrAc}, \In{c}{categoria}}{bool}{
+  \If{($c$ == \nom{Raiz}($ac$))}  \comp{|c|}
+    \State $res$ $\gets$ true  \comp{1}
+  \Else
+    \State $res$ $\gets$ \nom{Definido?}($c$,$ac$.tr)  \comp{|c|}
+  \EndIf
+  \State \compTot{|c|}
+}
+
+\Algoritmo{iEsSubCategoria}{\In{ac}{estrAc}, \In{pa}{categoria}, \In{hi}{categoria}}{bool}{
+  \State nodoCat $q$ $\gets$ \nom{Obtener}($hi$,$ac$.tr)  \comp{|hi|}
+  \State bool $esSubCat$ $\gets$ false  \comp{1}
+  
+  \While{$¬$(\nom{CategoriaNodo}($q$) == \nom{Raiz}($ac$))}  \comp{h}
+%    \State $q$ $\gets$ \nom{NodoPadre}($q$)  \comp{1}
+    \If{(\nom{CategoriaNodo}($q$) == $pa$)}  \comp{1}
+      \State $esSubCat$ $\gets$ true  \comp{1}
+    \EndIf
+  \State $q$ $\gets$ \nom{NodoPadre}($q$)  \comp{1}
+  \EndWhile
+  \State $res$ $\gets$ $esSubCat$ \comp{1}
+  \State \compTot{|hi| + h}
+}\
+
+Justificaci\'on de la complejidad: el while itera como mucho $h$ veces, ya que en el peor caso, el nodo sobre el que itera es una hoja del arbol, y como en cada llamado, se le asigna el valor del nodo de su padre, lo maximo que puede recorrer es la atura del \'arbol. Por otro lado, obtener de $c$ en el diccionario es $O(|c|)$, y como el resto de las funciones tienen complejidad $O(1)$, la complejidad total del algoritmo es $O(|hi| + h)$. \\
+
+\Algoritmo{iAlturaCategoria}{\In{ac}{estrAc},\In{c}{categoria}}{nat}{
+  \State nodoCat $r$ $\gets$ \nom{Obtener}($c$,$ac$.tr)  \comp{|c|}
+  \State $res$ $\gets$ \nom{AlturaNodo}($r$)  \comp{1}
+  \State \compTot{|c|}
+}
+
+\Algoritmo{iHijos}{\In{ac}{estrAc},\In{c}{categoria}}{ItCategorias}{
+  \State nodoCat $r$ $\gets$ \nom{Obtener}($c$,$ac$.tr)  \comp{|c|}
+  \State $itHijos$ $\gets$ \nom{CrearItCategorias}(\nom{HijosNodo}($r$)) \comp{1}
+  \State $res$ $\gets$ $itHijos$  \comp{1}
+  \State \compTot{|c|}
+}
+
+
+\Algoritmo{CrearNodo}{\In{id}{nat},\In{altura}{nat},\In{cat}{categoria},\In{padre}{estrNodo}}{estrNodo}{
+  \State $res$.id $\gets$ $id$ \comp{1}
+  \State $res$.alturaNodo $\gets$ $altura$  \comp{1}
+  \State $res$.cat $\gets$ \nom{Copiar}($cat$)  \comp{|cat|}
+  \State $res$.padre $\gets$ $\&padre$  \comp{1}
+  \State $res$.hijos $\gets$ \nom{Vacio}()  \comp{1}
+  \State \compTot{|cat|}
+}
+
+\Algoritmo{iIdNodo}{\In{n}{estrNodo}}{nat}{
+  \State $res$ $\gets$ $n$.id  \comp{1}
+  \State \compTot{1}
+}
+
+\Algoritmo{iAlturaNodo}{\In{n}{estrNodo}}{nat}{
+  \State $res$ $\gets$ $n$.altura  \comp{1}
+  \State \compTot{1}
+}
+
+\Algoritmo{iCategoriaNodo}{\In{n}{estrNodo}}{string}{
+  \State $res$ $\gets$ $n$.cat  \comp{1}
+  \State \compTot{1}
+%Aliasing: res no es modificable.
+}
+
+\Algoritmo{iNodoPadre}{\In{n}{estrNodo}}{estrNodo}{
+  \State $res$ $\gets$ *($n$.padre)  \comp{1}
+  \State \compTot{1}
+}
+
+\Algoritmo{iTienePadre}{\In{n}{estrNodo}}{bool}{
+  \State $res$ $\gets$ ($n$.padre $\neq$ NULL) \comp{1}
+  \State \compTot{1}
+}
+
+\Algoritmo{HijosNodo}{\In{n}{estrNodo}}{conj(categoria)}{
+  \State $res$ $\gets$ $n$.hijos  \comp{1}
+  \State \compTot{1}
+}
+
+\Algoritmo{AgregarCatHija}{\In{n}{estrNodo}, \In{c}{categoria}}{}{
+  \State itUniConj(srting) $it$ $\gets$ \nom{CrearItConj}($n$.hijos) \comp{1}
+  \State $it$ $\gets$ \nom{AgregarRapido}($n$.hijos,$c$) \comp{|c|}
+  \State \compTot{|c|}
+}
+
+\Algoritmo{iCrearItCategoria}{\In{c}{conj(puntero(nodoCat))}}{itCat}{
+	\State itConj(puntero(nodoCat)) $it$ $\gets$ \nom{CrearIt}(c) \comp{1}
+	\State $res$.c $\gets$ $it$ \comp{1}
+	\State \compTot{1}
+}
+    
+\Algoritmo{iHaySiguiente?}{\In{it}{itCat}}{bool}{
+	\State $res$ $\gets$ \nom{HaySiguiente?}($itCat$.c) \comp{1}
+	\State \compTot{1}
+}
+\Algoritmo{iSiguiente}{\In{it}{itCat}}{nodoCat}{
+	\State $res$ $\gets$ \nom{*Siguiente}($itCat$.c) \comp{1}
+	\State \compTot{1}
+}
+ 
+\Algoritmo{iAvanzar}{\Inout{it}{itCat}}{}{
+	\State \nom{Avanzar}($itCat$.c) \comp{1}
+	\State \compTot{1}
+}
+  
+% \Algoritmo{iCrearItCategorias}{\In{c}{string}, \In{ac}{estrAc}}{itc}{
+% 	\State nodoCat $q$ $\gets$ \nom{Obtener}($c$,$ac$.tr) \comp{|c|}
+% 	\State lista(puntero(nodoCat)) $ls$ $\gets$ \nom{Vacia}() \comp{1}
+% 	\While{$¬$(\nom{NodoPadre}($q$) = NULL)} \comp{h}
+% 	  \State \nom{AgregarAtras}($ls$,$\&q$) \comp{1}
+% 	  \State $q$ $\gets$ \nom{NodoPadre}($q$) \comp{1}
+% 	\EndWhile
+% 	\State $res$.c $\gets$ \nom{CrearIt}($ls$) \comp{1}
+% 	\State \compTot{|c| + h}
+% }	\
+% 
+% Justificaci\'on de la complejidad: el while itera como mucho $h$ veces, ya que en el peor caso, el nodo sobre el que itera es una hoja del arbol, y como en cada llamado, se le asigna el valor del nodo de su padre, lo maximo que puede recorrer es la atura del \'arbol. Por otro lado, obtener de $c$ en el diccionario es $O(|c|)$, y como el resto de las funciones tienen complejidad $O(1)$, la complejidad total del algoritmo es $O(|hi| + h)$. \\
+% 	
+% 
+% \Algoritmo{iHayMasItCategorias}{\In{it}{itc}}{bool}{
+% 	\State $res$ $\gets$ \nom{HayMas}($it$.c) \comp{1}
+% 	\State \compTot{1}
+% }	
+% 
+% \Algoritmo{iAvanzarItCategorias}{\Inout{it}{itc}}{}{
+% 	\State \nom{Avanzar}($it$.c) \comp{1}
+% 	\State \compTot{1}
+% }	
+% 
+% \Algoritmo{iSiguienteItCategorias}{\In{it}{itc}}{estrNodo}{
+% 	\State $res$ $\gets$ *(\nom{Siguiente}($it$.c)) \comp{1}
+% 	\State \compTot{1}
+% }	
+
+
+\end{Algoritmos}
+
+\Titulo{Observaciones}
+ \begin{itemize}
+	\item \nom{CrearNodo}, \nom{AgregarCatHija} e \nom{HijosNodo} no se exportan
+\end{itemize}
+
+
+
+
+
+\begin{Servicios Usados}
+\begin{itemize}
+	\item \nom{AgregarAdelante}($xs$,$x$) y \nom{CrearIt}(lista) debe ser $O(1)$
+	\item \nom{CrearArreglo}($n$) debe ser $O(n)$ 
+	\item \nom{Copiar}(s) debe ser $O(|s|)$
+	\item \nom{Obtener}($c$,$d$) debe ser $O(|c|)$
+	\item \nom{Claves}($d$) debe ser $O(1)$
+	\item \nom{Cardinal}($c$) debe ser $O(1)$
+\end{itemize}
+
+\end{Servicios Usados}
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LINKLINKIT
+
+\section{M\'odulo LINKLINKIT}
+
+\begin{Interfaz}   
+
+  \textbf{se explica con}: \tadNombre{LinkLinkIt}. 
+  
+  \textbf{g\'eneros}: \TipoVariable{lli}, \TipoVariable{itLinks(infoLink)}.
+  
+  \Titulo{Operaciones de LinkLinkIt}
+  
+
+ \InterfazFuncion{Iniciar}{\In {ac}{acat}}{ lli}
+  {$res$ $\igobs$ iniciar($ac$)}
+  [$O(\#Categorias(ac))$]
+  [Crea un nuevo sistema.]
+  [Se hace aliasing con respecto a la variable $ac$.]
+
+ \InterfazFuncion{NuevoLink}{\Inout{s}{lli}, \In{l}{link}, \In{c}{categoria}}{}
+  [$s$ \igobs $s_0$ $\land$  $¬$($l$ $\in$ links($s$)) $\land$ esta?($c$, categorias($s$))]
+  {$s$ $\igobs$ nuevoLink($s_0$,$l$,$c$)}
+  [$O(|l| + |c| + h)$ donde $h$ es la altura del arbol]
+  [Agrega un nuevo link al sistema.]
+  [No se hace aliasing con respecto a $l$ ni con respecto a $c$]
+  
+
+\InterfazFuncion{Acceso}{\Inout{s}{lli}, \In{l}{link}, \In{f}{fecha}}{}
+  [$s$ = $s_0$ y $l$ $\in$ links($s$) y $f$ $\geq$ fechaActual($s$)]
+  {$s$ $\igobs$ acceso($s_0$,$l$,$f$)}
+  [$O(|l| + h)$]
+  [Registra las fechas de los accesos a el link dado.]
+  [No se hace aliasing con respecto a $link$ ni con respecto a $f$.]
+
+
+\InterfazFuncion{Categorias}{\In{s}{lli}}{itCategorias}
+  {$res$ $\igobs$ categorias($s$)}
+  [$O(1)$]
+  [Devuelve las categorias del sistema.]
+  [$res$ no es modificable.]
+
+
+\InterfazFuncion{Links}{\In{s}{lli}}{itLinks}
+ {$res$ $\igobs$ links($s$)}
+ [$O(CantLinks(Raiz(Categorias(s))* (|c| + |l|))$ donde $c$ es la categor\'ia con el nombre m\'as largo y $l$ es el link con el nombre m\'as largo.]
+ [Devuelve los links del sistema.]
+ [$res$ no es modificable.]
+
+
+\InterfazFuncion{CategoriaLink}{\In{s}{lli}, \In{l}{link}}{categoria}
+ {$res$ $\igobs$ categoriaLink ($s$,$l$)}
+ [$O(|l|)$]
+ [Dado un link, devuelve su categoria.]
+ [No se hace aliasing con respecto a $r$, y $res$ no es modificable.]
+
+\InterfazFuncion{FechaActual}{\In{s}{lli}}{fecha}
+ {$res \igobs$ fechaActual($s$)}
+ [$O(1)$]
+ [Devuelve la fecha actual del sistema.]
+
+ \newpage
+
+\InterfazFuncion{FechaUltimoAcceso}{\In{s}{lli}, \In{l}{link}}{fecha}
+ [$l$ $\in$ links($s$)]
+ {$res \igobs$ fechaUltimoAcceso ($s$,$l$)}
+ [$O(|l|)$]
+ [Dado un link del sistema, devuelve la fecha de su \'ultimo acceso.]
+ [No se hace aliasing con respecto a $l$.]
+
+\InterfazFuncion{AccesosRecientesDia}{\In{s}{lli}, \In{l}{link}, \In{f}{fecha}}{nat}
+ [$l$ $\in$ links($s$) $\land$ esReciente?($s$,$l$,$f$)]
+ {$res$ $\igobs$ accesosRecientesDia($s$,$l$,$f$)}
+ [$O(|l| + Longitud(fya))$ donde $fya$ es una lista con la fecha de lo accesos del link $l$]
+ [Dada una fecha que sea reciente para el link, devuelve los accesos recientes del link para esa fecha.]
+ [No se hace aliasing con respecto a $l$ ni con respecto a $f$.]
+
+
+\InterfazFuncion{EsReciente?}{\In{s}{lli}, \In{l}{link}, \In{f}{fecha}}{bool}
+ [$l$ $\in$ links($s$)]
+ {$res$ $\igobs$ esReciente? ($s$,$l$,$f$)}
+ [$O(|l|)$]
+ [Dado un link, devuelve true si la fecha pasada por par\'ametro es reciente para ese link.]
+ [No se hace aliasing con respecto a $l$ ni con respecto a $f$.]
+
+
+\InterfazFuncion{AccesosRecientes}{\In{s}{lli}, \In{c}{categoria}, \In{l}{link}}{nat}
+ [esta?($c$,categorias($s$)) $\land$ $l$ $\in$ links($s$) $\land$ esSubCategoria(categorias($s$),$c$,categoriaLink($s$,$l$))]
+ {$res$ $\igobs$ accesosRecientes ($s$,$c$,$l$)}
+ [$O(|c| + |l|)$]
+ [Dado una categor\'ia y un link de esa categor\'ia, devuelve los accesos recientes para ese link]
+ [No se hace aliasing con respecto a $c$ ni con respecto a $l$.]
+
+
+\InterfazFuncion{LinksOrdenadosPorAccesos}{\In{s}{lli}, \In{c}{categoria}}{itLinks}
+ [esta?($c$,categorias($s$))]
+ {$res$ $\igobs$ linksOrdenadosPorAccesos ($s$,$c$)}
+ [$O(|c| + n)$ en llamadas consecutivas, $O(|c| + n^2)$ en otro caso]
+ [Dada una categor\'ia devuelve una lista de links ordenados por cantidad de accesos recientes]
+ [No se hace aliasing con respecto a $c$.]
+
+
+\InterfazFuncion{CantLinks}{\In{s}{lli}, \In{c}{categoria}}{nat}
+ [esta?($c$,categorias($s$))]
+ {$res$ $\igobs$ cantLinks ($s$,$c$)}
+ [$O(|c|)$]
+ [Devuelve la cantidad de liks de la categor\'ia $c$]
+ [No se hace aliasing con respecto a $c$.]
+
+ 
+ \InterfazFuncion{CrearItLinks}{\In{s}{lli}, \In{l}{lista(infoLink)}}{itLinks}
+ {alias(esPermutacion?(SecuSuby($res$), $l$))}
+ [$O(|l|)$]
+ [Crea un iterador que se corresponde con la funci\'on que devuelve links ordenados por accesos]
+ [$res$ no es modificable.]
+ 
+
+\InterfazFuncion{HayMasLinks}{\In{it}{itLinks}}{bool}
+ {$res$ $\igobs$ hayMas?($it$)}
+ [$O(1)$]
+ [Devuelve $true$ si hay mas elementos en la lista para iterar]
+ 
+ \InterfazFuncion{AvanzarItLinks}{\In{it}{itLinks}}{}
+ {$res$ $\igobs$ avanzar($it$)}
+ [$O(1)$]
+ [Avanza el iterador]
+ 
+ \InterfazFuncion{ActualItLinks}{\In{it}{itLinks}}{infoLink}
+ {alias($res$ $\igobs$ actual?($it$))}
+ [$O(1)$]
+ [Devuelve el elemento al que est\'a apuntando el iterador]
+ [$res$ no es modificable.]
+
+ 
+
+\end{Interfaz}
+
+\begin{Representacion}
+\parskip=5 pt
+
+  \Titulo{Representaci\'on de LinkLinkIt}
+
+  \begin{Estructura}{lli}[estrSis]  
+    \begin{Tupla}[estrSis]
+      \tupItem{links}{diccTrie(link,nodoLink)}
+      \tupItem{arbolCat}{puntero(acat)} \newline
+      \tupItem{Ids}{arregloDimensionable(puntero(nodoIds))}
+      \tupItem{accesosSis}{lista(acceso)} \newline
+      \tupItem{linksOrdenados}{listaDeIterador}
+      \tupItem{linksDelSistema}{lista(infoLink)}
+    \end{Tupla}\
+
+\parskip=5 pt
+
+    \begin{Tupla}[accesos]
+      \tupItem{f}{fecha}
+      \tupItem{link}{puntero(link)}
+    \end{Tupla}
+    
+    \begin{Tupla}[nodoIds]
+      \tupItem{$\#$links}{nat}
+      \tupItem{linksCatEHijos}{puntero(lista(puntero(nodoLink)))}
+      \tupItem{diaUltimoAcceso}{fecha}
+    \end{Tupla}
+    
+    \begin{Tupla}[nodoLink]
+      \tupItem{AccesosLink}{lista(fechaYAccesos)}
+      \tupItem{cat}{puntero(categoria)}
+      \tupItem{l}{link}
+    \end{Tupla}
+
+    \begin{Tupla}[fechaYAccesos]
+      \tupItem{f}{fecha}
+      \tupItem{$\#$accesos}{nat}
+    \end{Tupla}
+
+    \begin{Tupla}[listaDeIterador]
+      \tupItem{c}{categoria}
+      \tupItem{esLlamadaConsecutiva}{bool}
+      \tupItem{ls}{lista(puntero(infoLink))}
+    \end{Tupla}
+    
+  \end{Estructura} \
+    
+\begin{Estructura}{itLinks}[itL]  
+  donde itL es Tupla(it: itLista(infoLink), ls: lista(infoLink))
+  \end{Estructura} 
+
+  
+    
+    \Titulo{Invariante de representaci\'on en castellano}
+    
+\begin{enumerate}
+	\item $arbolCat$ no es NULL.
+	\item El tamaño de $ids$ es igual a la cantidad de categorias de $arbolCat$.
+	\item $\#$links de $nodoIds$ tiene que ser igual a $Longitud(linksCatEHijos)$.
+	\item $diaUltimoAcceso$ de $nodoIds$ es igual a la fecha $f$ de acceso cuyo link tenga la categoria con id $i$, siendo $i$ la posicion $ids$ donde esta ese $nodoIds$.
+	\item para todo link de $linksCatEHijos$, ese link pertenece a $claves$ del diccTrie links.
+	\item la categoria de $listaDeIterador$ pertenece a las categorias de $arbolCat$.
+	\item si la lista $ls$ de $listaDeIterador$ no es vacia, implica que esta ordenada de mayor a menor por $accesosRecientes$.
+	\item todos los links de esa lista pertenecen al diccTrie $links$, y las categorias a las categorias de $arbolCat$.
+	\item Para todo link de claves del diccTrie links, la componente l de su significado coincide con la clave, 
+	\subitem 9.1. cada posicion de $accesosLink$ de $nodoLink$ tiene fechas distintas entre si, estan ordenadas de mayor a menor y ademas pertenecen a la lista $accesosSis$,
+	\subitem 9.2. $\#accesos$ es la suma de los accesos que tuvo el link l en la lista $accesosSis$.
+	\item si $accesosSis$ no es vacia, para cada posicion de la lista, el link pertenece a las claves del diccTrie, y la fecha $f$ es mayor o igual que la fecha siguiente en la lista.
+	\item Para todo $in$ de tipo infoLink, el link est\'a definido en el diccTrie, la categor\'ia es a la que pertenece el link y $\#$Accesos se corresponde con los accesos de ese link.
+\end{enumerate}
+
+
+     
+    \Rep[estrSis][e]{
+(1) $e$.arbolCat $\neq$ NULL $\yluego$ \newline \\
+(2) tam($e$.ids) = $\#$categorias(*($e$.arbolCat)) + 1 $\wedge$ \newline \\
+(3) ($\forall$ $i$: nat) 1 $\leq$ $i$ $\leq$ tam($e$.ids) $\Rightarrow$ ((($e$.ids[$i$]) $\rightarrow$ $\#$links = longitud($e$.ids[$i$] $\rightarrow$ linksCatEHijos)) $\wedge$ \newline \\
+(4) (($e$.ids[$i$]) $\rightarrow$ diaUltimoAcceso = diaUltAccParaCatConId($i$, $e$, $e$.accesosSis))) $\wedge$ \newline \\
+(5) ($\forall$ $l$: link) ($l$ $\in$ ($e$.ids[$i$]) $\rightarrow$ linksCatEHijos) $\impluego$ ($l$ $\in$ claves($e$.links)) $\wedge$ \newline \\
+(6) $e$.linksOrdenados.c $\in$ categorias(*($e$.arbolCat)) $\wedge$ \newline \\
+(7) ($¬$vacia?($e$.linksOrdenados.ls) $\impluego$ (estaOrdenada($e$.linksOrdenados.ls)) $\wedge$ \newline \\
+(8) losLinksEstanEnElArbol($e$.linksOrdenados.ls, $e$.links)) $\wedge$ \newline \\
+(9) ($\forall$ $li$: link)($li$ $\in$ claves($e$.links) $\impluego$ $li$ = (obtener($li$,$e$.links)).l $\wedge$ \newline \\ 
+(9.1) fechasDistintasOrdenadasYEnSis(obtener($li$, $e$.links).accesosLink, $e$.accesosSis) $\wedge$ \newline \\ 
+(9.2) mismaCantAccesos($li$, obtener($li$, $e$.links).accesosLink, $e$.accesosSis)) $\wedge$ \newline \\
+(10) ($¬$vacia?($e$.accesosSis) $\impluego$ fechasOrdenadasYLinksEnTrie($e$.accesosSis, $e$.links)) \newline \\
+(11) ($\forall$ $in$: infoLink) ($in$ $\in$ $e$.linksDelSistema) $\impluego$ (def?(obtenerLink($in$), $e$. links) $\wedge$ \newline
+(obtenerCategoriaLink($in$) $\in$ categorias($e$.arbolCat)) $\wedge$ (obtenerAccesosRecientes ($in$) = 
+accesosRecientes($s$, obtenerLink($in$), obtenerCategoriaLink($in$)))) \\
+}
+
+ \tadOperacion{diaUltAccParaCatConId}{nat, lli, secu(nat,string)}{nat}{}
+ \tadAxioma{diaUltAccParaCatConId($i$,$e$,$ls$)}{\IF vacia?($ls$) THEN 0 ELSE {\IF id(*($e$.arbolCat), categoriaLink($e$.prim($ls$).l)) = $i$ THEN prim($ls$).f ELSE diaUltAccParaCatConId($i$,$e$,fin$ls$) FI}FI}\
+
+ \tadOperacion{estaOrdenada}{secu(infoLink)}{bool}{}
+ \tadAxioma{estaOrdenada($ls$)}{\IF longitud($ls$) $\leq$ 1 THEN true ELSE {\IF obtenerAccesosRecientes(prim($ls$)) $\geq$ obtenerAccesosRecientes (prim(fin($ls$))) THEN estaOrdenada(fin($ls$)) ELSE false FI}FI}\
+
+ \newpage
+ 
+ \tadOperacion{losLinksEstanEnElArbol}{secu(infoLink), dicc(string,nodoLink)}{bool}{}
+ \tadAxioma{losLinksEstanEnElArbol($ls$,$d$)}{\IF vacia?($ls$) THEN true ELSE {\IF obtenerLink(prim($ls$)) $\in$ claves($d$) THEN losLinksEstanEnElArbol(fin($ls$),$d$) ELSE false FI}FI}\
+
+ \tadOperacion{fechasDistintasOrdenadasYEnSis}{secu(tupla(nat,nat)), secu(tupla(nat,string))}{bool}{}
+ \tadAxioma{fechasDistintasOrdenadasYEnSis($la$,$ls$)}{\IF (longitud($la$) $\leq$ 1) $\wedge$ (estaFecha?($\Pi_1$(prim($la$)),$ls$)) THEN true ELSE 
+ {\IF ($\Pi_1$(prim($la$)) > $\Pi_1$(prim(fin($la$))) $\wedge$ (estaFecha?($\Pi_1$(prim($la$)),$ls$)) THEN fechasDistintasOrdenadasYEnSis(fin($la$),$ls$) ELSE false FI}FI}\
+
+ \tadOperacion{estaFecha}{nat, secu(tupla(nat,string))}{bool}{}
+ \tadAxioma{estaFecha(fe,ls)}{\IF vacia?($ls$) THEN false ELSE {\IF $\Pi_1$(prim($ls$)) = $fe$ THEN true ELSE estaFecha($fe$,fin($ls$)) FI}FI}\
+ 
+ \tadOperacion{mismaCantAccesos}{string, secu(tupla(nat,nat)), secu(tupla(nat,string))}{bool}{}
+ \tadAxioma{mismaCantAccesos($l_0$,$la$,$ls$)}{\IF vacia?($la$) THEN true ELSE {\IF mismaCantAccesosAux($l_0$,$la$,$ls$,0) THEN mismaCantAccesos($l_0$,fin($la$),$ls$) ELSE false FI}FI}\
+ 
+ \tadOperacion{mismaCantAccesosAux}{string, secu(tupla(nat,nat)), secu(tupla(nat,string)), nat}{bool}{}
+ \tadAxioma{mismaCantAccesosAux($l_0$,$fya$,$ls$,$cont$)}{\IF vacia?($ls$) THEN $cont$ = $\Pi_2$($fya$) ELSE {\IF $\Pi_1$($fya$) < $\Pi_2$(prim($ls$)) THEN mismaCantAccesosAux($l_0$,$fya$,fin($ls$),cont) ELSE 
+ {\IF $\Pi_1$($fya$) = $\Pi_2$(prim($ls$)) THEN {\IF $\Pi_2$($l_0$) THEN mismaCantAccesosAux($l_0$,$fya$,fin($ls$),$cont$ +1) ELSE mismaCantAccesosAux($l_0$,$fya$,fin($ls$),$cont$) FI} ELSE $cont$ = $\Pi_2$($fya$) FI}FI}FI}\
+ 
+ \tadOperacion{fechasOrdenadasYLinksEnTrie}{secu(tupla(nat,string)), dicc(string, nodoLink)}{bool}{}
+ \tadAxioma{fechasOrdenadasYLinksEnTrie($la$,$d$)}{\IF vacia?($la$) THEN true ELSE {\IF longitud($la$) = 1 THEN def?(prim($la$).l, $d$) ELSE 
+ {\IF prim($la$).f $\geq$ prim(fin($la$)).f THEN fechasOrdenadasYLinksEnTrie (fin($la$),$d$) ELSE false FI} FI}FI}\
+ 
+ \tadOperacion{accesosRecientes}{estrSis, link, categoria}{nat}{}
+ \tadAxioma{accesosRecientes($s$,$l$,$cat$)}{accesosRecientesAux($*s$.[ids(s.arbolCat($cat$))].linksCatEHijos, $l$, $*s$.[ids(s.arbolCat($cat$))].diaUltimoAcceso)}\
+ 
+ \tadOperacion{accesosRecientesAux}{lista(puntero(nodoLink), link, nat}{nat}{}
+ \tadAxioma{accesosRecientes($ls$,$l$,$d$)}{\IF vacia?($ls$) THEN 0 ELSE 
+ {\IF (*prim($ls$)).l = l THEN {\IF (prim(*(prim($ls$)).accesosLink).f + 2) $\geq$ d THEN prim(*(prim($ls$)).accesosLink).f + 
+ accesosRecientesAux(fin($ls$), $l$, $d$) ELSE accesosRecientesAux(fin($ls$), $l$, $d$) FI} ELSE accesosRecientesAux(fin($ls$), $l$, $d$) FI} FI}\
+~
+\\
+
+\Abs[estrSis]{LinkLinkIt}[e]{s}{categorias($s$) = Categorias(*($e$.arbolCat)) \newline
+                                                                links($s$) = claves($e$.links) \newline
+                                                                fechaActual($s$) = prim($e$.accesosSis).f
+                                                                ($\forall$ $l$:link)($l$ $\in$ links($s$)) tuvoAccesosEnSis($e$.accesosSis,$l$) $\Rightarrow_L$         
+                                (fechaUltimoAcceso($s$,$l$) = Primero(obtener($l$, $e$.links).accesosLink).f \newline
+                                                                ($\forall$ $l$: link)($\forall$ $f$: fecha)($l$ $\in$ links($s$) $\wedge$ esReciente?($s$,$l$,$f$)) $\Rightarrow_L$         
+                                                                   (accesosRecientesDia($s$,$l$,$f$) = ObtenerAccesos(obtener($l$, $e.links$).accesosLink, f))}
+
+                                                                   
+                                                                   
+\tadOperacion{tuvoAccesosEnSis}{secu(tupla(nat,string)), string}{bool}{}
+\tadAxioma{tuvoAccesosEnSis($ls$,$l_0$)}{\IF vacia?($ls$) THEN false ELSE {\IF prim($ls$).l = $l_0$ THEN true ELSE tuvoAccesosEnSis(fin($ls$),$l_0$) FI}FI}\
+ 
+ \newpage
+ 
+\tadOperacion{obtenerAccesos}{secu(tupla(nat,nat)), nat}{nat}{}
+\tadAxioma{obtenerAccesos($la$,$fr$)}{\IF vacia?($la$) THEN 0 ELSE {\IF prim($la$).f + 2 $\geq$ $fr$ THEN prim($la$).$\#$accesos + obtenerAccesos(fin($la$), $fr$) ELSE obtenerAccesos(fin($la$), $fr$) FI}FI}\
+
+% 
+%   \Titulo{Representaci\'on de itLinksOrdenados}
+%   
+%   \begin{Estructura}{itLinksOrdenados}[it]
+%   \begin{Tupla}[it]
+%       \tupItem{siguiente}{puntero(infoLink)}
+%       \tupItem{listaOrdenadaLinks}{puntero(listaDeIterador)}
+%     \end{Tupla}
+%   
+%   \end{Estructura}
+% 
+ \end{Representacion}
+
+
+\begin{Algoritmos}
+
+\parskip=5 pt
+
+
+\Algoritmo{iIniciar}{\In{ac}{acat}}{estrSis}{
+  \State $res$.arbolCat $\gets$ $\&ac$ \comp{1}
+  \State $res$.links $\gets$ \nom{Vacio}() \comp{1}
+  \State $res$.ids $\gets$ \nom{CrearArreglo}(\nom{Cardinal}(\nom{Categorias}($ac$)) + 1) \comp{$\#$Categorias(ac)}
+  \State $res$.ids[0] $\gets$ NULL \comp{1}
+  \State $res$.accesosSis $\gets$ \nom{Vacia}() \comp{1}
+  \State $res$.linksOrdenados.c $\gets$ \nom{Vacia}() \comp{1}
+  \State $res$.linksOrdenados.esLlamadaConsecutiva $\gets$ false \comp{1}
+  \State $res$.linksOrdenados.ls $\gets$ \nom{Vacia}() \comp{1}
+  \State nat $i$ $\gets$ 1 \comp{1}
+  \While{($i$ < \nom{Tam}($res$.ids))}  \comp{$\#$Categorias(ac)}
+    \State nodoIds $r$  \comp{1}
+    \State $r$.$\#$links $\gets$ 0  \comp{1}
+    \State $r$.linksCatEHijos $\gets$ \nom{Vacia}() \comp{1}
+    \State $r$.diaUltimoAcceso $\gets$ 0 \comp{1}
+    \State $res$.ids[$i$] $\gets$ $\&r$  \comp{1}
+    \State $i$ $\gets$ $i$ + 1 \comp{1}
+  \EndWhile
+  \State \compTot{$\#$\nom{Categorias}(ac)}
+}\
+
+Justificaci\'on de la complejidad: Dado un $acat$ obtenemos las categor\'ias en $O(\#Categorias(ac))$ por lo tanto creamos el arreglo en O($\#$Categorias(ac)). En el while, como mucho recorremos $\#Categorias$ por lo tanto, la complejidad es $O(\#Categorias(ac))$. Entonces, la complejidad total del algoritmo es $O(2 * \#Categorias(ac)) = O(\#Categorias(ac))$.\\
+ \newpage
+
+\Algoritmo{iNuevoLink}{\Inout{s}{estrSis}, \In{l}{string}, \In{c}{string}}{}{
+  \State nodoLink $f_1$
+  \State $f_1$.accesosLink $\gets$ \nom{Vacia}() \comp{1}
+  \State $f_1$.cat $\gets$ $\&$\nom{Copiar}($c$)  \comp{1}
+  \State $f_1$.l $\gets$ \nom{Copiar}($l$) \comp{|l|}
+  \State \nom{Definir}($l$,$f_1$,$s$.links) \comp{|l|}
+  \State nodoLink $nd$ $\gets$ \nom{Obtener}($l$,$s$.links) \comp{|l|}
+  \State infoLink $info$ $\gets$ \nom{CrearInfoLink}($nd$.link, $nd$.cat, 0) \comp{1}
+  \State \nom{AgregarAtras}(linksDelSistema, $info$) \comp{1}
+  \If{ ($c$ $\neq$ \nom{Raiz}($s$.arbolCat)} \comp{|c|}
+    \State categoria $catPadre$ $\gets$ \nom{Padre}($c$, $s$.arbolCat) \comp{|c|}
+    \State itCategorias $it$ $\gets$ \nom{Hijos}(catPadre, $s$.arbolCat) \comp{|c|}
+    \State puntero(nodoCat) $padre$ $\gets$ $\&$(\nom{nodoPadre}(\nom{Siguiente}($it$))) \comp{1}
+    \State \nom{AgregarAdelante}(($s$.ids[\nom{Id}($s$.arbolCat, $c$)]) $\rightarrow$ linksCatEHijos), $\&nd$) \comp{1}
+    \State ($s$.ids[\nom{Id}($s$.arbolCat, $c$)]) $\rightarrow$ $\#$Links $\gets$ \nom{Longitud}(ids[\nom{Id}($s$.arbolCat, $c$)] $\rightarrow$ linksCatEHijos) \comp{1}
+      %Recorro los sucesivos padres hasta llegar a la raiz.
+    \While{\nom{TienePadre}($padre$)} \comp{h}
+      \State nat $id$ $\gets$ \nom{IdNodo}($padre$) \comp{1}
+      \State \nom{AgregarAdelante}(($s$.ids[$id$] $\rightarrow$ linksCatEHijos), $\&nd$) \comp{1}
+      \State ($s$.ids[$id$] $\rightarrow$ $\#$links) $\gets$ \nom{Longitud}($s$.ids[$id$] $\rightarrow$ linksCatEHijos) \comp{1}
+      \State $padre$ = \nom{NodoPadre}($\&padre$) \comp{1}
+    \EndWhile
+  \EndIf
+  %actualiza la raiz
+  \State \nom{AgregarAdelante}(($s$.ids[1] $\rightarrow$ linksCatEHijos), $\&nd$) \comp{1}
+  \State ($s$.ids[1] $\rightarrow$ $\#$links) $\gets$ \nom{Longitud}($s$.ids[1] $\rightarrow$ linksCatEHijos) \comp{1}
+  \State $s$.linksOrdenados.esLlamadaConsecutiva $\gets$ false \comp{1}
+  \State \compTot{|l| + |c| + h}
+}\
+
+Justificaci\'on de la complejidad: El while itera en el peor caso $h$ veces, y como las funciones que se realizan dentro del
+mismo tienen complejidad $O(1)$, la complejidad el while es $O(h)$. Por otro lado, el resto de las funciones (fuera del while) tienen
+complejidad $O(|c|)$, $O(|l|)$ y $O(1)$, por lo que al sumar todas, la complejidad total del algoritmo es $O(|l| + |c| + h)$.\\
+
+
+\Algoritmo{iAcceso}{\Inout{s}{estrSis}, \In{l}{string}, \In{fecha}{nat}}{}{
+  \State nodoLink $in$ $\gets$ \nom{Obtener}($l$,$s$.links) \comp{|l|}
+  \If{($\neq$(\nom{EsVacia}($in$.accesosLink)) $\wedge$ (\nom{Primero}($in$.accesosLink).f == $fecha$))}  \comp{1}
+    \State \nom{Primero}($in$.accesosLink) $\gets$ \nom{Primero}($in$.accesosLink) + 1  \comp{1}
+  \Else
+    \State fechaYAccesos $fa$ \comp{1}
+    \State $fa$.$\#$accesos $\gets$ 1 \comp{1}
+    \State $fa$.f $\gets$ $fecha$ \comp{1}
+    \State \nom{AgregarAdelante}($in$.accesosLink, $fa$) \comp{copy(fa)) = O(1}
+  \EndIf
+  \State acceso $acc$ \comp{1}
+  \State $acc$.f $\gets$ $fecha$ \comp{1}
+  \State $acc$.link $\gets$ \nom{Copiar}($\&in$.l) \comp{|l|}
+  \State \nom{AgregarAdelante}($s$.accesosSis, $acc$) \comp{copy(acc)) = O(1}
+  \State nat $i$ $\gets$ \nom{Id}(*($in$.cat), $s$.arbolCat) \comp{h}
+  \State (($s$.ids[$i$]) $\rightarrow$ diaUltimoAcceso) $\gets$ $fecha$ \comp{1}
+  \State $s$.linksOrdenados.esLlamadaConsecutiva $\gets$ false  \comp{1}
+  \State \compTot{|l| + h}
+}\
+Justificaci\'on de la complejidad: La complejidad total del algoritmo es $O(|l| + h)$, por ser suma de funciones con complejidad 
+$O(|l|)$, $O(h)$ y $O(1)$.\\
+
+
+
+\Algoritmo{iCategorias}{\In{s}{estrSis}}{itCategorias}{
+  \State $res$ $\gets$ Categorias(*($s$.arbolCat)) \comp{1}
+  \State \compTot{1}
+}
+
+\Algoritmo{iLinks}{\In{s}{estrSis}}{itL}{
+  \State $ls$ $\gets$ $s$.linksDelSistema \comp{1}
+  \For{nat $i$ $\gets$ 0 \textbf{to} \nom{Longitud}($ls$)} \comp{Longitud(ls) * (|ls.link| + |ls[i].cat|)}
+    \State link $l$ $\gets$ *(ls[$i$].link) \comp{|ls.link|}
+    \State categoria $cat$ $\gets$ *(ls[$i$].cat) \comp{|ls[i].cat|}
+    \State ls[$i$].accesosRec $\gets$ \nom{AccesosRecientes}($cat$, $l$) \comp{|cat| + |l|}
+  \EndFor
+  \State $res$ $\gets$ \nom{CrearItLinks}($ls$) \comp{1}
+  \State \compTot{Longitud(ls) * (|ls.link| + |ls[i].cat|)}
+}
+
+
+\Algoritmo{iCategoriaLink}{\In{s}{estrSis}, \In{l}{string}}{string}{
+  \State nodoLink $f$ $\gets$ \nom{Obtener}($l$,$s$.links) \comp{|l|}
+  \State $res$ $\gets$ $f$.cat \comp{1}
+  \State \compTot{|l|}
+% res no es modificable
+}
+
+\Algoritmo{iFechaActual}{\In{s}{estrSis}}{fecha}{
+ \State acceso $a$ $\gets$ \nom{Primero}($s$.accesosSis) \comp{1}
+ \State $res$ $\gets$ $a$.f \comp{1}
+ \State \compTot{1}
+}
+
+\Algoritmo{iFechaUltimoAcceso}{\In{s}{estrSis}, \In{l}{string}}{nat}{
+  \State nodoLink $i$ $\gets$ \nom{Obtener}($l$,$s$.links) \comp{|l|}
+  \State $res$ $\gets$ \nom{Primero}($i$.accesosLink).f \comp{1}
+  \State \compTot{|l|}
+}
+
+\Algoritmo{iAccesosRecientesDia}{\In{s}{estrSis}, \In{l}{string}, \In{fecha}{nat}}{nat}{
+  \State nodoLink $in$ $\gets$ \nom{Obtener}($l$,$s$.links) \comp{|l|}
+  \State lista(fechaYAccesos) $fya$ $\gets$ $in$.accesosLink \comp{1}
+  \State itLista(fechaYAccesos) $it$ $\gets$ \nom{CrearIt}($fya$)
+  \While{(\nom{HaySiguiente}($it$))} \comp{Longitud(fya)}
+    \If{(\nom{Siguiente}($it$).f == $fecha$)}
+      \State $res$ $\gets$ \nom{Siguiente}($it$).$\#$accesos \comp{1}
+    \Else
+      \State \nom{Avanzar}($it$) \comp{1}
+    \EndIf
+  \EndWhile
+  \State \compTot{|l| + Longitud(fya)}
+  %donde fya es obtener(l, s.links).accesosLink
+}
+
+Justificaci\'on de la complejidad:  El while itera sobre la cantidad de elementos que hay en $fya$, y como las funciones que 
+se encuentran dentro del mismo tienen complejidad $O(1)$, la complejidad del while es $O(Longitud(fya))$. Y como el resto de 
+las funciones del algoritmo tienen complejidad $O(|l|)$ y $O(1)$, la complejidad total del algoritmo es $O(|l| + Longitud(fya))$\\
+
+
+\Algoritmo{iEsReciente}{\In{s}{estrSis}, \In{l}{string}, \In{fecha}{nat}}{bool}{
+  \State $res$ $\gets$ (\nom{MenorReciente}($s$,$l$) $\leq$ $fecha$) $\wedge$ ($fecha$ $\leq$ \nom{FechaUltimoAcceso}($s$,$l$)) \comp{|l|}
+  \State \compTot{|l|}
+}
+
+\Algoritmo{MenorReciente}{\In{s}{estrSis}, \In{l}{string}}{nat}{
+  \State nat $res$ $\gets$ \nom{Max}(\nom{FechaUltimoAcceso}($s$,$l$) + 1, diasRecientes) - diasRecientes \comp{|l|}
+  \State \compTot{|l|}
+}
+
+\Algoritmo{Max}{\In{n}{nat}, \In{m}{nat}}{nat}{
+  \If{$n$ > $m$} \comp{1}
+    \State $res$ $\gets$ $n$ \comp{1}
+  \Else
+    \State $res$ $\gets$ $m$ \comp{1}
+  \EndIf
+  \State \compTot{1}
+}
+
+\newpage
+
+\Algoritmo{iAccesosRecientes}{\In{s}{estrSis}, \In{c}{string}, \In{l}{string}}{nat}{
+  \State nat $recientes$ $\gets$ \nom{DiasRecientesParaCategoria}($s$,$c$) \comp{|c|}
+  \State nat $accesos$ $\gets$ 0 \comp{1}
+  \State nodoLink $info$ $\gets$ \nom{Obtener}($l$,$s$.links) \comp{|l|}
+  \State itLista(fechaYAccesos) $itF$ $\gets$ \nom{CrearIt}($info$.accesosLink) \comp{1}
+  \For{nat $i$ $\gets$ 0 \textbf{to} 2}
+    \If{(\nom{HaySiguiente}($itF$))} \comp{1}
+      \State nat $fecha$ $\gets$ \nom{Siguiente}($itf$).f \comp{1}
+      \If{($recientes$ $\leq$ $fecha$ + 2)} \comp{1}
+	\State nat $accesosDeEseLink$ $\gets$ \nom{Siguiente}($itF$).$\#$accesos \comp{1}
+	\State $accesos$ $\gets$ $accesos$ + $accesosDeEseLink$ \comp{1}
+      \EndIf
+      \State \nom{Avanzar}($itF$) \comp{1}
+    \EndIf
+  \State $res$ $\gets$ $accesos$ \comp{1}
+  \EndFor
+  \State \compTot{|c| + |l|}
+}
+
+\Algoritmo{AccesosRecientesRapido}{\In{s}{estrSis}, \In{recientes}{nat}, \In{nl}{nodoLink}}{nat}{ %NO ESTA EN LA INTERFAZ??
+  \State nat $accesos$ $\gets$ 0 \comp{1}
+  \State itLista(fechaYAccesos) $itf$ $\gets$ \nom{CrearIt}($nl$.accesosLink) \comp{1}
+  \For{nat $i$ $\gets$ 0 \textbf{to} 2} \comp{1}
+    \If{(\nom{HaySiguiente)}(itF)}
+      nat $fecha$ $\gets$ \nom{Siguiente}(itF).f \comp{1}
+      \If{($recientes$ $\leq$ $fecha$ + 2)} \comp{1}
+	\State nat $accesosDeEseLink$ $\gets$ \nom{Siguiente}($itF$).$\#$accesos \comp{1}
+	\State $accesos$ $\gets$ $accesos$ + $accesosDeEseLink$ \comp{1}
+      \EndIf
+      \nom{Avanzar}($itF$)
+    \EndIf
+  \EndFor
+  \State $res$ $\gets$ $accesos$ \comp{1} x
+  \State \comp{1}
+}
+
+
+%Devuelve la fecha del ultimo acceso a un link de la categoria c
+
+\Algoritmo{DiasRecientesParaCategoria}{\In{s}{estrSis}, \In{c}{string}}{nat}{
+  \State nat $i$ $\gets$ \nom{Id}(*($s$.arbolCat),$c$) \comp{|c|}
+  \State $res$ $\gets$ ($s$.ids[$i$]) $\rightarrow$ diaUltimoAcceso \comp{1}
+  \State \compTot{|c|}
+}
+
+ \Algoritmo{iLinksOrdenadosPorAccesos}{\In{s}{estrSis}, \In{c}{string}}{itL}{
+     \If{($s$.linksOrdenados.$c$ = $cat$) $\land$ ($s$.linksOrdenados.esLlamadaConsecutiva)} \comp{|c|}
+       \State $res$ $\leftarrow$ \nom{CrearItLinks}($s$.linksOrdenados.ls) \comp{n}
+     \Else
+       \State nat $i$ $\leftarrow$ Id(c, *($s$.arbolCat)) \comp{|c|}
+       \State lista(puntero(nodoLink)) $listaLinks$ $\leftarrow$ ($s$.ids[$i$]) $\rightarrow$ linksCatEHijos \comp{1}
+       \State nat $d$ $\leftarrow$ ($s$.ids[$i$]) $\rightarrow$ diaUltimoAcceso \comp{1}
+       \State \nom{OrdenarEnElLugar}($s$,$listaLinks$,$d$) \comp{n^2}
+       \State $s$.linksOrdenados.c $\leftarrow$ copiar($cat$) \comp{|c|}
+       \State $s$.linksOrdenados.esLlamadaConsecutiva $\leftarrow$  true \comp{1}
+       \State \nom{PasarAListaInfoLink}($s$,$listaLinks$,$d$,$linksOrdenados.ls$) \comp{n}
+       \State $res$ $\leftarrow$ \nom{CrearItLinks}($s$.linksOrdenados.$ls$) \comp{1}
+     \EndIf
+     \State \compTot{|c| + n} en llamadas consecutivas
+     \State \compTot{|c| + n^2} en otro caso
+}
+
+\newpage
+
+\Algoritmo{OrdenarEnElLugar}{\Inout{s}{estrSis}, \In{ls}{lista(puntero(nodoLink))}, \In{diaUltimoAcceso}{nat}}{}{
+   \State itLista(puntero(nodoLink)) $it$ $\gets$ \nom{CrearIt}($ls$) \comp{1}
+   \For{(nat $i$ $\gets$ 0 \textbf{to} \nom{Longitud}($ls$) - 1)} \comp{\sum_{i=0}^{Longitud(ls)}{O(Longitud(ls)))} = O({Longitud(ls)}^2}
+     \State itLista(puntero(nodoLink)) $max$ $\gets$ $it$ \comp{1}
+     \State itLista(puntero(nodoLink)) $it_0$ $\gets$ $it$ \comp{1}
+     \State \nom{Avanzar}($it_0$) \comp{1}
+     \For{(nat $j$ = $i$ + 1 \textbf{to}\nom{Longitud}($ls$))} \comp{\sum_{i=0}^{Longitud(ls)}{O(1)}) = O(Longitud(ls)}
+       \If (\nom{AccesosRecientesRapido}($s$,$diaUltimoAcceso$,*(\nom{Siguiente}($it_0$)) > \newline
+	  \State \nom{AccesosRecientesRapido}($s$,$diaUltimoAcceso$,*(\nom{Siguiente}(max))) \comp{1}
+	  \State $max$ $\gets$ $it_0$ \comp{1}
+       \EndIf
+       \State \nom{Avanzar}($it_0$)
+     \EndFor
+     \State puntero(nodoLink) $aux$ $\gets$ \nom{Siguiente}($it$) \comp{1}
+     \State \nom{Siguiente}($it$) $\gets$ \nom{Siguiente}($max$) \comp{1}
+     \State \nom{Siguiente}($max$) $\gets$ $aux$ \comp{1}
+     \State \nom{Avanzar}($ti$) \comp{1}
+   \EndFor
+  \State \compTot{{Longitud(ls)}^2}
+}
+
+% \Algoritmo{PasarAListaString}{\In {ls}{lista(puntero(nodoLink))}}{lista(puntero(string))}{
+%   \State lista(puntero(String)) $lstr$ $\gets$ \nom{Vacia}() \comp{1}
+%   \State itLista(puntero(nodoLink)) $it$ $\gets$ \nom{CrearIt}($ls$) \comp{1}
+%   \While{\nom{HayMas}($it$)} \comp{Longitud($ls$)}
+%     \State string $s$ $\gets$ *(\nom{Siguiente}($it$)).l \comp{1}
+%     \State \nom{AgregarAtras}($lstr$, $\&s$) \comp{1}\
+%     \State \nom{Avanzar($it$)} \comp{1}
+%   \EndWhile
+%   \State $res$ $\gets$ $lstr$ \comp{1}
+%   \State \compTot{Longitud($ls$)}
+% 
+% }
+
+\Algoritmo{iCantLinks}{\In{s}{estrSis}, \In{c}{categoria}}{nat}{
+ \State nat $i$ $\gets$ \nom{Id}(*($s$.arbolCat),$c$) \comp{|c|}
+ \State $res$ $\gets$ ($s$.ids[$i$]) $\rightarrow$ $\#$links \comp{1}
+ \State \compTot{|c|}
+}
+
+ \Algoritmo{iCrearItLinks}{\Inout{s}{estrSis}, \In{l}{lista(infoLink)}}{itL}{
+    \State $res$.ls $\gets$ \nom{Copiar}($l$) \comp{|l|}
+    \State $res$.it $\gets$ \nom{CrearIt}($res$.ls) \comp{1}
+    \State \compTot{|l|}
+  }
+
+ \Algoritmo{iAvanzarItLinks}{\Inout{it}{itL}}{}{
+         \State \nom{Avanzar}($it$) \comp{1}
+         \State \compTot{1}
+   }
+   
+ \Algoritmo{iActualItLinks}{\In{it}{itL}}{infoLink}{
+    \State $res$ $\leftarrow$ \nom{Actual}($it$) \comp{1}
+    \State \compTot{1}
+ }
+ 
+  \Algoritmo{iHayMasItLinks}{\In{it}{itL}}{bool}{
+    \State $res$ $\leftarrow$ \nom{HayMas?}($it$) \comp{1}
+    \State \compTot{1}
+ }
+ 
+ \Algoritmo{PasarAListaInfoLink}{\In{s}{estrSis}, \In{recientes}{nat}, \newline
+ \In {listaLinks}{lista(puntero(nodoLink))}, \In {ls}{lista(infoLink)}}{}{
+ 
+  \State lista(puntero(infoLink)) $lin$ $\gets$ \nom{Vacia}() \comp{1}
+  \State itLista(puntero(nodoLink)) $it$ $\gets$ \nom{CrearIt}($listaLinks$) \comp{1}
+  \While{\nom{HaySiguiente}($it$)} \comp{Longitud(listaLinks)}
+    \State nat $accesosRec$ $\gets$ \nom{AccesosRecientesRapido}($recientes$,\nom{*Siguiente}($it$)) \comp{1}
+    \State infoLink $in$ $\gets$ tupla(\nom{Siguiente}($it$) $\rightarrow$ link, \nom{Siguiente}($it$) $\rightarrow$ cat, accesosRec) \comp{1}
+    \State \nom{AgregarAtras}($lin$,$in$) \comp{1}
+    \State \nom{Avanzar}($it$) \comp{1}
+  \EndWhile
+  \State $ls$ $\gets$ $lin$ \comp{1}
+  \State \compTot{Longitud(listaLinks)}
+}
+
+Justificaci\'on de la complejidad: El while itera sobre la cantidad de elementos que hay en $listaLinks$, y 
+como todas las funciones que estan dentro del mismo tienen complejidad $O(1)$, la complejidad del while es $O(Longitud(listaLinks))$.
+ Como el resto de las funciones tienen complejidad $O(1)$, la complejidad total es $O(Longitud(listaLinks))$.\\
+
+
+
+\end{Algoritmos}
+
+
+\begin{Servicios Usados}
+\begin{itemize}
+	\item \nom{Vacia}() debe ser $O(1)$
+	\item \nom{CrearArreglo}($n$) debe ser $O(n)$ 
+	\item \nom{Cardinal}($c$) debe ser $O(1)$
+	\item \nom{Tam}($ls$) debe ser $O(1)$
+	\item \nom{CrearIt}($ls$) debe ser $O(1)$
+	\item \nom{Siguiente}($it$) debe ser $O(1)$
+	\item \nom{AgregarAtras}($ls$,$e$) debe ser $O(1)$
+\end{itemize}
+
+\end{Servicios Usados}
+
+\newpage
+
+
+\section{M\'odulo InfoLink}
+
+\begin{Interfaz}
+
+%usa: link, categoria, nat, lli
+  \textbf{se explica con}: \tadNombre{Tupla(string, string, nat)}.
+
+  \textbf{g\'eneros}: \TipoVariable{infoLink}.
+
+  \Titulo{Operaciones b\'asicas de infoLink}
+  
+ 
+  \InterfazFuncion{CrearInfoLink}{\In{l}{link}, \In{c}{categoria}, \In{acc}{nat}}{infoLink}
+  [$¬$vacio($l$) $\wedge$ $¬$vacio(c)]
+  {$res$ \igobs $\left<{l,c,acc}\right>$}
+  [$O(1)$]
+  [Crea un nuevo $infoLink$.]
+  [Hace aliasing con respecto a $l$ y con respecto a $c$.]
+
+  \InterfazFuncion{ObtenerLink}{\In{info}{infoLink}}{link}
+  {$res$ \igobs $\Pi_1$($info$)}%
+  [$O(1)$]
+  [Dado un $infoLink$ devuelve un link.]
+  [$res$ no es modificable.]
+
+  \InterfazFuncion{ObtenerCategoriaLink}{\In{info}{infoLink}}{categoria}
+  {$res$ \igobs $\Pi_2$($info$)}
+  [$O(1)$]
+  [Dado un $infoLink$ devuelve una categor\'ia.]
+  [$res$ no es modificable.]
+  
+  \InterfazFuncion{ObtenerAccesosRecientes}{\In{info}{infoLink}}{nat}
+  {$res$ \igobs $\Pi_3$($info$)}
+  [$O(1)$]
+  [Devuelve el conjunto de claves del diccionario.]
+  
+\end{Interfaz}
+
+
+%(DESPUES HAY QUE VER QUE CAMBIA EN REP, ABS, Y ALGORITMOS)
+
+\begin{Representacion}
+  
+  \Titulo{Representaci\'on de InfoLink}
+
+
+  \begin{Estructura}{infoLink}[estrInfo]
+    \begin{Tupla}[estrInfo]
+     \tupItem{l}{puntero(link)}
+     \tupItem{c}{puntero(categoria)}
+     \tupItem{accesosRec}{nat}
+    \end{Tupla}
+  \end{Estructura}
+  
+\Rep[estrInfo][e]{$¬$vacio((*$e$.l)) $\wedge$ $¬$vacio(*($e$.c))}
+
+~
+\\
+
+\Abs[estrInfo]{infoLink}[e]{i}{$\Pi_1$($i$) = $e$.l $\wedge$ $\Pi_2$($i$) = $e$.c $\wedge$ $\Pi_3$($i$) = $e$.accesosRec}
+ 
+\end{Representacion}
+
+\newpage
+
+\begin{Algoritmos}
+
+\parskip=5 pt
+
+\Algoritmo{iCrearInfoLink}{\In{l}{link}, \In{c}{categoria}, \In{acc}{nat}}{estrInfo}{
+	\State $res$.l $\gets$ $\&l$ \comp{1} 
+	\State $res$.c $\gets$ $\&c$ \comp{1} 
+	\State $res$.accesosRec $\gets$ $acc$	\comp{1}
+	\State \compTot{1}
+}
+
+
+\Algoritmo{iObtenerLink}{\In{info}{estrInfo}}{string}{
+	\State $res$ $\gets$ *($info$.l) \comp{1}
+	\State \compTot{1}
+}
+
+\Algoritmo{iObtenerCategoriaLink}{\In{info}{estrInfo}}{string}{
+	\State $res$ $\gets$ *($info$.c) \comp{1}
+	\State \compTot{1}
+}
+
+\Algoritmo{iObtenerAccesosRecientes}{\In{info}{estrInfo}}{string}{
+   \State $res$ $\gets$ $info$.accesoRec \comp{1}
+   \State \compTot {1}
+}
+
+\end{Algoritmos}
+
+
+\end{document}
+
+%VER ORDENAR EN EL LUGAR
